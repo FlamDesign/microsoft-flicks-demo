@@ -56,8 +56,6 @@ img.fi.ld{opacity:1}
 .gitem:hover{background:#2c2c2c}
 .gitem.cur{background:#232f3a}
 .gitem .n{width:20px;flex:none;color:#9a9a9a;font-size:12px;font-variant-numeric:tabular-nums}
-.sr-open .gpill{bottom:96px}
-.sr-open .gpanel{bottom:146px}
 .pulse{animation:pulse 2.2s ease-out 1}
 @keyframes pulse{0%{box-shadow:0 0 0 0 #ffd23f}15%{box-shadow:0 0 0 4px #ffd23f}100%{box-shadow:0 0 0 4px transparent}}
 
@@ -202,7 +200,7 @@ img.fi.ld{opacity:1}
 .sr-arrows{position:absolute;right:calc(50% - 350px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
 .sr-arrows button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#bbb;transition:background .15s}
 .sr-arrows button:hover{background:#262626}
-.sr-chat{background:#1c1c1c;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;min-height:0}
+.sr-chat{background:#1c1c1c;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;min-height:0;padding-bottom:64px}
 .sr-chat .head{height:44px;flex:none;display:flex;align-items:center;padding:0 16px;color:#aaa;font-size:13px;gap:8px}
 .sr-chat .body{flex:1;overflow-y:auto;scroll-behavior:smooth;padding:4px 18px 10px;scrollbar-width:thin;scrollbar-color:#3a3a3a transparent;font-size:14.5px;line-height:1.6;color:#e6e6e6}
 .sr-chat .body .msg-u{margin:10px 0 14px}
@@ -419,6 +417,9 @@ img.fi.ld{opacity:1}
 .rel a:hover{text-decoration:underline}
 
 /* responsive */
+@media (max-width:1360px){
+  .cp-foot{padding-bottom:62px}
+}
 @media (max-width:1100px){
   .mg{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sr-body{grid-template-columns:minmax(0,1fr);padding-left:24px;padding-right:24px}
@@ -434,7 +435,8 @@ img.fi.ld{opacity:1}
   .cp-side{display:none}
   .cp-top{padding:0 14px}
   .cp-col{padding:4px 14px 30px}
-  .cp-foot{padding:0 12px 8px}
+  .cp-foot{padding:0 12px 58px}
+  .cp-disc{margin:6px 0 0}
   .cp-composer{height:52px;padding:0 8px 0 14px}
   .cp-composer .voice{width:36px;height:36px}
   .cp-home{padding:7vh 16px 24px}
@@ -448,7 +450,7 @@ img.fi.ld{opacity:1}
   .srbtn{height:auto;min-height:42px;padding:6px 6px 6px 8px;text-align:left;line-height:1.3}
   .qopts button{height:auto;min-height:38px;padding:8px 14px;text-align:left}
   /* showroom */
-  .sr{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 30%}
+  .sr{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 38%}
   .sr-brand .tags{display:none}
   .sr-brand{padding:10px 14px;margin-bottom:10px}
   .sr-chat .body{font-size:13.5px}
@@ -536,8 +538,7 @@ img.fi.ld{opacity:1}
   /* ad selector */
   .gpill{right:12px;bottom:12px;height:36px;padding:0 12px}
   .gpanel{right:12px;left:12px;width:auto;bottom:56px}
-  body[data-view=copilot] .gpill{bottom:auto;top:9px;right:84px;height:32px;font-size:12px;padding:0 10px}
-  body[data-view=copilot] .gpanel{bottom:auto;top:48px;transform-origin:top right}
+  .sr-chat{padding-bottom:58px}
 }
 </style>
 </head>
