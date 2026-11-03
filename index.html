@@ -424,11 +424,27 @@ img.fi.ld{opacity:1}
   .mg{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sr-body{grid-template-columns:minmax(0,1fr);padding-left:24px;padding-right:24px}
   .sr-tabs{padding-left:24px}
+  .sr-body aside{max-width:440px}
   .sr{grid-template-columns:minmax(0,1fr) 300px}
   .sr-arrows{display:none}
   .msn-wrap{padding:0 20px 90px}
 }
-@media (max-width:860px){
+@media (max-width:900px){
+  .cp{grid-template-columns:minmax(0,1fr)}
+  .cp-side{display:none}
+  .bh-nav{display:none}
+  .msn-hdr .r{display:none}
+  .msn-wrap{padding:0 16px 90px}
+}
+@media (min-width:641px) and (max-width:900px){
+  .pick{grid-template-columns:240px minmax(0,1fr)}
+  .sr{grid-template-columns:minmax(0,1fr) 300px}
+  .bh-feed{margin-left:12px;margin-right:12px}
+  .bh-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bh-row.top{grid-template-columns:minmax(0,1fr)}
+  .bh-row>.games{grid-column:span 2}
+}
+@media (max-width:640px){
   .view{overflow-x:clip}
   /* copilot */
   .cp{grid-template-columns:minmax(0,1fr)}
@@ -530,6 +546,7 @@ img.fi.ld{opacity:1}
   .sr-tabs::-webkit-scrollbar{display:none}
   .sr-tabs span{flex:none}
   .sr-body{grid-template-columns:minmax(0,1fr);gap:26px;padding:16px 12px 90px}
+  .sr-body aside{max-width:none}
   .sr-sec-h h2{font-size:18px}
   .pcard.fl{flex-basis:200px}
   .pnext{display:none}
@@ -825,6 +842,8 @@ function observeFlicks(){
   io = new IntersectionObserver(entries=>{ entries.forEach(en=>{ if(en.isIntersecting) mount(en.target); }); /* keep players once loaded so scrolling back never reloads them */ }, { rootMargin:"900px 0px 900px 0px" });
   document.querySelectorAll(live).forEach(h=>io.observe(h));
   requestAnimationFrame(mountVisible); setTimeout(mountVisible, 80); setTimeout(settleImgs, 50);
+  // pages carry five Flicks or fewer: start them all now so none is still loading when scrolled into view
+  setTimeout(()=>document.querySelectorAll(live).forEach((h,i)=>setTimeout(()=>mount(h), i*150)), 250);
 }
 function mountVisible(){
   document.querySelectorAll(live).forEach(h=>{ const r=h.getBoundingClientRect(); if(r.width && r.bottom > -900 && r.top < innerHeight+900) mount(h); });
