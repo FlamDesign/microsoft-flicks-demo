@@ -808,12 +808,13 @@ function flick(id, brand, cls=""){
   const b=BRANDS[brand];
   return `<div class="flick fl-${brand} ${b.dark?"dark":""} ${cls}" data-slot="${id}"><div class="fstate load"></div></div>`;
 }
-function variantOf(id){ const s=SLOTS[id], b=BRANDS[s.brand]; return b.variants[s.variant] || b.variants[0]; }
+function variantOf(id){ const s=SLOTS[id]; if(!s) return {n:""}; const b=BRANDS[s.brand]; return b.variants[s.variant] || b.variants[0]; }
 function shop(id){ const s=SLOTS[id]; if(!s) return; openSheet(s.brand, variantOf(id).url || BRANDS[s.brand].url); }
 const onSwitch = {};
 function syncVariant(id){
   const s=SLOTS[id]; if(!s) return;
-  document.querySelectorAll(`[data-vname="${id}"]`).forEach(el=>{ el.style.opacity=0; setTimeout(()=>{ el.textContent = variantOf(id).n; el.style.opacity=1; },150); });
+  const name = variantOf(id).n;
+  document.querySelectorAll(`[data-vname="${id}"]`).forEach(el=>{ el.style.opacity=0; setTimeout(()=>{ el.textContent = name; el.style.opacity=1; },150); });
   document.querySelectorAll(`[data-sync="${id}"]`).forEach(el=>el.classList.toggle("on", +el.dataset.i===s.variant));
   if(onSwitch[id]) onSwitch[id](s.variant);
 }
