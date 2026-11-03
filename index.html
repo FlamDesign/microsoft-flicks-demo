@@ -450,22 +450,19 @@ img.fi.ld{opacity:1}
   .srbtn{height:auto;min-height:42px;padding:6px 6px 6px 8px;text-align:left;line-height:1.3}
   .qopts button{height:auto;min-height:38px;padding:8px 14px;text-align:left}
   /* showroom */
-  .sr{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 38%}
-  .sr-brand .tags{display:none}
-  .sr-brand{padding:10px 14px;margin-bottom:10px}
-  .sr-chat .body{font-size:13.5px}
-  .sr-chat .note{display:none}
-  .sr-chat .cp-composer{height:44px;margin:0 10px 8px}
-  .sr-stage{padding:8px 8px 0}
-  .sr-bar{margin-bottom:4px}
-  .sr-chat{border-left:0;border-top:1px solid #2a2a2a}
-  .sr-chat .head{display:none}
-  .sr-chat .body{padding:8px 14px}
-  .sr-card{padding:10px 10px 110px;border-radius:16px 16px 0 0}
-  .sr-brand{padding:14px;gap:12px}
-  .sr-brand .lg{height:34px}
-  .sr-brand h2{font-size:18px}
-  .sr-brand p{font-size:12.5px}
+  /* showroom on phones: the Flick gets the room, chat sits below */
+  .sr{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(200px,29%)}
+  .sr-stage{padding:2px 6px 0}
+  .sr-bar{height:28px;margin-bottom:2px;padding:0 4px}
+  .sr-wrap{flex-direction:column;align-items:stretch}
+  .sr-card{flex:1;min-height:0;height:auto;width:100%;padding:6px 6px 14px;border-radius:14px 14px 0 0}
+  .sr-brand{padding:8px 12px;gap:10px;margin-bottom:6px;border-radius:12px}
+  .sr-brand .lg{height:24px}
+  .sr-brand h2{font-size:15.5px}
+  .sr-brand p,.sr-brand .tags{display:none}
+  .sr-hero{border-radius:12px}
+  .sr-now{margin:8px 4px 0;font-size:12px}
+  .sr-sec{margin-top:20px}
   .sr-sec h3{font-size:17px}
   .sr-fin{gap:6px}
   .sr-fin button{padding:5px 5px 8px}
@@ -474,11 +471,14 @@ img.fi.ld{opacity:1}
   .sr-grid{gap:10px}
   .sr-tile b{font-size:13px}
   .sr-tile span{font-size:12px}
-  .sr-wrap{flex-direction:column;align-items:stretch}
-  .sr-card{flex:1;min-height:0;height:auto;width:100%;padding-bottom:16px}
-  .sr-cta{position:static;transform:none;width:100%;justify-content:center;gap:6px;padding:8px 8px 4px;background:#f1f1ef}
-  .sr-cta button{height:38px;padding:0 12px;font-size:12.5px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
-  .sr-spons{position:static;background:#f1f1ef;padding:2px 0 8px;font-size:11px}
+  .sr-cta{position:static;transform:none;width:100%;justify-content:center;gap:6px;padding:6px 6px 8px;background:#f1f1ef}
+  .sr-cta button{height:36px;padding:0 12px;font-size:12.5px;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+  .sr-spons{display:none}
+  .sr-chat{border-left:0;border-top:1px solid #2a2a2a}
+  .sr-chat .head,.sr-chat .note{display:none}
+  .sr-chat .body{padding:8px 14px 4px;font-size:13.5px}
+  .sr-chat .body .msg-u{margin:4px 0 8px}
+  .sr-chat .cp-composer{height:44px;margin:0 10px 8px}
   /* MSN */
   .msn-hdr{height:60px;gap:12px;padding:0 12px}
   .msn-logo{font-size:21px}
@@ -538,7 +538,7 @@ img.fi.ld{opacity:1}
   /* ad selector */
   .gpill{right:12px;bottom:12px;height:36px;padding:0 12px}
   .gpanel{right:12px;left:12px;width:auto;bottom:56px}
-  .sr-chat{padding-bottom:58px}
+  .sr-chat{padding-bottom:52px}
 }
 </style>
 </head>
