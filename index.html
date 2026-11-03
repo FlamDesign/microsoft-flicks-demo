@@ -467,9 +467,11 @@ img.fi.ld{opacity:1}
   .sr-grid{gap:10px}
   .sr-tile b{font-size:13px}
   .sr-tile span{font-size:12px}
-  .sr-cta{bottom:30px;gap:6px;width:calc(100% - 20px);justify-content:center}
-  .sr-cta button{height:38px;padding:0 12px;font-size:12.5px;border-radius:10px}
-  .sr-spons{bottom:8px;font-size:11px}
+  .sr-wrap{flex-direction:column;align-items:stretch}
+  .sr-card{flex:1;min-height:0;height:auto;width:100%;padding-bottom:16px}
+  .sr-cta{position:static;transform:none;width:100%;justify-content:center;gap:6px;padding:8px 8px 4px;background:#f1f1ef}
+  .sr-cta button{height:38px;padding:0 12px;font-size:12.5px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .sr-spons{position:static;background:#f1f1ef;padding:2px 0 8px;font-size:11px}
   /* MSN */
   .msn-hdr{height:60px;gap:12px;padding:0 12px}
   .msn-logo{font-size:21px}
@@ -949,7 +951,7 @@ const SHOW = {
       ["mbRoad","On the road","A smooth, settled ride at city and highway speeds."],
       ["mbStar","Presence","The three-pointed star on a long, elegant bonnet."]]},
     cta:[["Make an enquiry",true],["Explore the S-Class lineup",false]],
-    intro:"Welcome to the Mercedes-Benz S-Class virtual showroom. The car on the left is live: tap any colour under it to see the S-Class in that finish. Ask me anything about the cabin, the ride or booking a test drive.",
+    intro:"Welcome to the Mercedes-Benz S-Class virtual showroom. The showroom car is live: tap any colour under it to see the S-Class in that finish. Ask me anything about the cabin, the ride or booking a test drive.",
     sugs:[
       ["Which colour suits a chauffeured car?","Most chauffeur fleets lean to black for a formal look; white and the green finish read more personal and show less dust day to day. Tap each in the showroom to compare them on the same car."],
       ["What is the rear seat like?","The rear is the S-Class's strongest point: reclining seats, its own screens and a very quiet cabin. Scroll the showroom to see the interior."],
@@ -964,7 +966,7 @@ const SHOW = {
       ["bClock","Details","The small things are made to the same standard as the big ones."],
       ["bBadge","Heritage","The winged B, on a car built to your own specification."]]},
     cta:[["Get in touch",true],["Explore the Bentley range",false]],
-    intro:"Welcome to the Bentley Torcal virtual showroom. The car on the left is live: tap a finish under it to see the Torcal in white, olive or blue. Ask me about craftsmanship, ownership or speaking to a retailer.",
+    intro:"Welcome to the Bentley Torcal virtual showroom. The showroom car is live: tap a finish under it to see the Torcal in white, olive or blue. Ask me about craftsmanship, ownership or speaking to a retailer.",
     sugs:[
       ["What makes a Bentley cabin different?","Each cabin is finished by hand in Crewe, with materials fitted piece by piece and most details chosen by the buyer."],
       ["Compare the three finishes","White is the classic choice, olive is the most distinctive and blue sits in between. Tap each in the showroom to see them on the same car and the same road."],
@@ -980,7 +982,7 @@ const SHOW = {
       ["cEsc","Escalade presence","Full-size space for family, luggage and long trips."],
       ["cSeats","Comfort","Supportive seats built for hours on the road."]]},
     cta:[["Explore your Cadillac",true],["Find a dealer",false]],
-    intro:"Welcome to the Cadillac virtual showroom. The drive on the left is live: tap a model under it to switch between Optiq, Celestiq and Escalade-V on the same road. Ask me which one fits you.",
+    intro:"Welcome to the Cadillac virtual showroom. The showroom drive is live: tap a model under it to switch between Optiq, Celestiq and Escalade-V on the same road. Ask me which one fits you.",
     sugs:[
       ["Optiq or Escalade-V for me?","Optiq if you want electric and easy city parking; Escalade-V if you want full-size space and V8 performance. Switch between them in the showroom to compare."],
       ["What is the Celestiq?","Celestiq is Cadillac's hand-built electric flagship, made to order for each owner."],
