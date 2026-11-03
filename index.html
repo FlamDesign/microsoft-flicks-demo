@@ -359,7 +359,7 @@ img.fi.ld{opacity:1}
 .sr-sbox:focus-within{box-shadow:0 0 0 1px #c4c4c4,0 3px 10px rgba(0,0,0,.12)}
 .sr-sbox input{flex:1;border:0;outline:0;font:inherit;font-size:16px}
 .sr-hdr .r{margin-left:auto;display:flex;align-items:center;gap:14px;color:#444;font-size:14px}
-.sr-tabs{display:flex;gap:28px;padding:16px 0 0 72px;border-bottom:1px solid #e5e5e5;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:#555}
+.sr-tabs{display:flex;gap:28px;padding:16px 0 0 72px;overflow-x:auto;scrollbar-width:none;white-space:nowrap;border-bottom:1px solid #e5e5e5;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:#555}
 .sr-tabs span{padding-bottom:10px;display:inline-flex;align-items:center;gap:6px;cursor:default}
 .sr-tabs span.on{color:#111;box-shadow:inset 0 -3px 0 #111}
 .sr-body{display:grid;grid-template-columns:minmax(0,720px) 400px;gap:40px;padding:22px 32px 90px 72px;animation:up .45s var(--ease)}
@@ -428,27 +428,109 @@ img.fi.ld{opacity:1}
   .msn-wrap{padding:0 20px 90px}
 }
 @media (max-width:860px){
+  .view{overflow-x:clip}
+  /* copilot */
   .cp{grid-template-columns:minmax(0,1fr)}
   .cp-side{display:none}
+  .cp-top{padding:0 14px}
+  .cp-col{padding:4px 14px 30px}
+  .cp-foot{padding:0 12px 8px}
+  .cp-composer{height:52px;padding:0 8px 0 14px}
+  .cp-composer .voice{width:36px;height:36px}
+  .cp-home{padding:7vh 16px 24px}
+  .cp-home h1{font-size:24px;margin-bottom:18px}
   .puw{grid-template-columns:1fr}
-  .pick{grid-template-columns:1fr}
-  .pick .fw{max-width:360px}
-  .sr{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 40%}
+  .puw button{min-height:0}
+  .msg-u div{font-size:14.5px}
+  .msg-c{font-size:15px}
+  .pick{grid-template-columns:1fr;gap:12px}
+  .pick .fw{max-width:none}
+  .srbtn{height:auto;min-height:42px;padding:6px 6px 6px 8px;text-align:left;line-height:1.3}
+  .qopts button{height:auto;min-height:38px;padding:8px 14px;text-align:left}
+  /* showroom */
+  .sr{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 38%}
+  .sr-stage{padding:8px 8px 0}
+  .sr-bar{margin-bottom:4px}
   .sr-chat{border-left:0;border-top:1px solid #2a2a2a}
-  .sr-cta{bottom:36px}
-  .sr-cta button{height:36px;padding:0 12px;font-size:12.5px;border-radius:10px}
-  .sr-fin{grid-template-columns:1fr 1fr}
+  .sr-chat .head{display:none}
+  .sr-chat .body{padding:8px 14px}
+  .sr-card{padding:10px 10px 110px;border-radius:16px 16px 0 0}
+  .sr-brand{padding:14px;gap:12px}
+  .sr-brand .lg{height:34px}
+  .sr-brand h2{font-size:18px}
+  .sr-brand p{font-size:12.5px}
+  .sr-sec h3{font-size:17px}
+  .sr-fin{gap:6px}
+  .sr-fin button{padding:5px 5px 8px}
+  .sr-fin b{font-size:12px;margin:6px 2px 0}
+  .sr-fin span{font-size:11px;margin:2px 2px 0}
+  .sr-grid{gap:10px}
+  .sr-tile b{font-size:13px}
+  .sr-tile span{font-size:12px}
+  .sr-cta{bottom:30px;gap:6px;width:calc(100% - 20px);justify-content:center}
+  .sr-cta button{height:38px;padding:0 12px;font-size:12.5px;border-radius:10px}
+  .sr-spons{bottom:8px;font-size:11px}
+  /* MSN */
+  .msn-hdr{height:60px;gap:12px;padding:0 12px}
+  .msn-logo{font-size:21px}
+  .msn-logo svg{width:28px}
+  .msn-search{height:40px;font-size:14px;padding:0 14px}
+  .msn-hdr .r{display:none}
+  .msn-wrap{padding:0 12px 90px}
+  .lb .unit{grid-template-columns:136px minmax(0,1fr);height:auto}
+  .lb .flick{width:136px;height:136px}
+  .lb .tx{padding:10px 12px}
+  .lb .dom{font-size:11px;margin-bottom:4px}
+  .lb h2{font-size:16px;margin-bottom:6px}
+  .lb .now{display:none}
+  .lb .cta{height:30px;padding:0 12px;font-size:12px}
+  .msn-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:14px -12px 12px;padding:0 12px}
+  .msn-tabs::-webkit-scrollbar{display:none}
+  .msn-tabs button{flex:none}
+  .msn-tabs .sp,.msn-tabs .ol{display:none}
+  .mg{grid-template-columns:minmax(0,1fr);gap:12px;grid-auto-rows:auto}
+  .mc{min-height:0}
+  .mc.w2{grid-column:auto;height:300px}
+  .mc.w2 h3{font-size:20px;max-width:none}
+  .mc .ph{min-height:200px}
+  .mc.wx{min-height:290px}
+  .msn-sec{margin:22px 0 10px}
+  /* Bing home */
+  .bh-hdr{height:56px;padding:0 14px;gap:12px}
   .bh-nav{display:none}
-  .strip a{flex-basis:calc((100% - 8px)/2)}
-  .bh-row,.bh-row.top{grid-template-columns:1fr}
-  .lb .unit{grid-template-columns:1fr;height:auto}
-  .lb .flick{width:100%;height:auto}
-  .mg{grid-template-columns:1fr}
-  .mc.w2{grid-column:auto}
-  .msn-hdr .r,.msn-tabs .sp,.msn-tabs .ol{display:none}
-  .dect .g{grid-template-columns:1fr}
-  .gpill{right:12px;bottom:12px}
-  .gpanel{right:12px;left:12px;width:auto;bottom:60px}
+  .bh-hdr .r{gap:14px;font-size:0}
+  .bh-hdr .r a{font-size:13px}
+  .bh-search{margin-top:10px;padding:0 12px}
+  .bh-sbox{height:46px;padding:0 14px;gap:10px}
+  .bh-chips{gap:8px;margin-top:14px}
+  .bh-chips button{height:36px;padding:0 12px;font-size:13px}
+  .bh-feed{margin:16px 8px 0;padding:8px}
+  .strip a{flex-basis:calc((100% - 8px)/2.2)}
+  .sarr{display:none}
+  .bh-row,.bh-row.top{grid-template-columns:minmax(0,1fr);gap:8px;margin-bottom:8px}
+  .bc.hero{height:250px}
+  .bc.hero h3{font-size:19px}
+  .bc.wxb{height:auto}
+  /* Bing search */
+  .sr-hdr{padding:12px 12px 0;gap:10px}
+  .sr-sbox{width:auto;flex:1;min-width:0;height:42px;padding:0 14px;gap:10px}
+  .sr-sbox svg:not(:first-child){display:none}
+  .sr-sbox input{font-size:15px;min-width:0}
+  .sr-hdr .r>span:not(:last-child){display:none}
+  .sr-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:12px 12px 0;gap:22px}
+  .sr-tabs::-webkit-scrollbar{display:none}
+  .sr-tabs span{flex:none}
+  .sr-body{grid-template-columns:minmax(0,1fr);gap:26px;padding:16px 12px 90px}
+  .sr-sec-h h2{font-size:18px}
+  .pcard.fl{flex-basis:200px}
+  .pnext{display:none}
+  .dect .g{grid-template-columns:minmax(0,1fr)}
+  .org h3{font-size:18px}
+  /* ad selector */
+  .gpill{right:12px;bottom:12px;height:36px;padding:0 12px}
+  .gpanel{right:12px;left:12px;width:auto;bottom:56px}
+  body[data-view=copilot] .gpill{bottom:auto;top:9px;right:84px;height:32px;font-size:12px;padding:0 10px}
+  body[data-view=copilot] .gpanel{bottom:auto;top:48px;transform-origin:top right}
 }
 </style>
 </head>
@@ -1162,6 +1244,7 @@ function route(){
   const [path, qs] = h.slice(1).split("?");
   const prev=lastRoute; lastRoute=path;
   if(path!=="/msn") clearInterval(heroT);
+  document.body.dataset.view = path.startsWith("/copilot") ? "copilot" : path==="/msn" ? "msn" : path==="/bing/search" ? "serp" : "bing";
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
   document.getElementById("sr").classList.remove("on"); document.body.classList.remove("sr-open");
   document.querySelectorAll(".gitem").forEach(el=>el.classList.toggle("cur", el.dataset.h.split("?")[0]==="#"+path));
