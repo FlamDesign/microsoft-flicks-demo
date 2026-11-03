@@ -5,40 +5,54 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Flicks on Microsoft: Concept Demo</title>
 <meta name="description" content="Concept demo by Flam: Flicks inside Copilot, Copilot showrooms, MSN and Bing.">
+<link rel="preconnect" href="https://images.unsplash.com">
 <style>
-:root{--ms:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif}
+:root{--ms:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;--ease:cubic-bezier(.2,.7,.2,1)}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
+html{scroll-behavior:smooth}
 body{font-family:var(--ms);-webkit-font-smoothing:antialiased;background:#1c1c1c;color:#111}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
 a{color:inherit;text-decoration:none}
 .view{display:none;min-height:100vh}
-.view.on{display:block}
+.view.on{display:block;animation:vin .45s var(--ease)}
+@keyframes vin{from{opacity:0}to{opacity:1}}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shim{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* images fade in when loaded */
+img.fi{opacity:0;transition:opacity .6s var(--ease)}
+img.fi.ld{opacity:1}
+.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.lift{transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.lift:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.zoomimg .cover{transition:transform .8s var(--ease),opacity .6s var(--ease)}
+.zoomimg:hover .cover{transform:scale(1.035)}
 
 /* ============ Flick slot (shared) ============ */
-.flick{position:relative;overflow:hidden;background:#eef0f2;width:100%;aspect-ratio:1/1}
-.flick iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
-.fstate{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;transition:opacity .4s;background:#eef0f2}
+.flick{position:relative;overflow:hidden;background:#e9ecef;width:100%;aspect-ratio:1/1}
+.flick iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;opacity:0;transition:opacity .6s var(--ease)}
+.flick.rdy iframe{opacity:1}
+.fstate{position:absolute;inset:0;pointer-events:none;transition:opacity .5s var(--ease);background:linear-gradient(100deg,#e6e9ec 30%,#f3f5f7 50%,#e6e9ec 70%);background-size:300% 100%;animation:shim 1.5s linear infinite}
 .fstate.hide{opacity:0}
-.fstate.load::after{content:"";width:28px;height:28px;border-radius:50%;border:3px solid #c9cfd4;border-top-color:#0078d4;animation:spin .9s linear infinite}
-.fstate.err{background:#2b1414;color:#ffd9d4;pointer-events:auto;padding:18px;text-align:center;font-size:12px;line-height:1.5}
+.flick.dark,.flick.dark .fstate{background-color:#141414}
+.flick.dark .fstate{background-image:linear-gradient(100deg,#151515 30%,#242424 50%,#151515 70%)}
+.fstate.err{animation:none;background:#2b1414;color:#ffd9d4;pointer-events:auto;padding:18px;text-align:center;font-size:12px;line-height:1.5;display:grid;place-items:center}
 .fstate.err b{display:block;font-size:14px;margin-bottom:6px;color:#fff}
 .fwarn{position:absolute;left:8px;bottom:8px;font-size:11px;background:#fff6db;color:#7a5600;border-radius:999px;padding:3px 9px;pointer-events:none}
-.flick.dark,.flick.dark .fstate{background:#141414}
-.flick.dark .fstate.load::after{border-color:#333;border-top-color:#d9d4c7}
-.flick.fl-bentley,.flick.fl-bentley .fstate{background:radial-gradient(120% 90% at 50% 45%,#3a3f44 0%,#16181a 60%,#08090a 100%)}
+.flick.fl-bentley{background:radial-gradient(120% 90% at 50% 45%,#3a3f44 0%,#16181a 60%,#08090a 100%)}
 
 /* ============ Ad selector ============ */
-.gpill{position:fixed;right:20px;bottom:20px;z-index:90;display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;background:#1b1b1b;color:#f2f2f2;font-weight:600;font-size:13px;box-shadow:0 0 0 1px #3a3a3a,0 8px 24px rgba(0,0,0,.45)}
+.gpill{position:fixed;right:20px;bottom:20px;z-index:90;display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;background:#1b1b1b;color:#f2f2f2;font-weight:600;font-size:13px;box-shadow:0 0 0 1px #3a3a3a,0 8px 24px rgba(0,0,0,.45);transition:bottom .3s var(--ease),background .2s}
 .gpill:hover{background:#262626}
 .gpill i{font-style:normal;background:#0078d4;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
 .gscrim{position:fixed;inset:0;z-index:88;display:none}
 .gscrim.on{display:block}
-.gpanel{position:fixed;right:20px;bottom:70px;z-index:89;width:300px;max-height:min(70vh,600px);overflow-y:auto;background:#1b1b1b;color:#f2f2f2;border-radius:16px;box-shadow:0 0 0 1px #3a3a3a,0 16px 40px rgba(0,0,0,.5);padding:6px 6px 8px;display:none;scrollbar-width:thin}
-.gpanel.on{display:block}
+.gpanel{position:fixed;right:20px;bottom:70px;z-index:89;width:300px;max-height:min(70vh,600px);overflow-y:auto;background:#1b1b1b;color:#f2f2f2;border-radius:16px;box-shadow:0 0 0 1px #3a3a3a,0 16px 40px rgba(0,0,0,.5);padding:6px 6px 8px;scrollbar-width:thin;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.gpanel.on{opacity:1;transform:none;pointer-events:auto}
 .gpanel h6{margin:10px 10px 4px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9a9a9a}
-.gitem{display:flex;gap:10px;align-items:center;width:100%;text-align:left;min-height:36px;padding:6px 10px;border-radius:8px;font-size:13px;line-height:1.3}
+.gitem{display:flex;gap:10px;align-items:center;width:100%;text-align:left;min-height:36px;padding:6px 10px;border-radius:8px;font-size:13px;line-height:1.3;transition:background .15s}
 .gitem:hover{background:#2c2c2c}
 .gitem.cur{background:#232f3a}
 .gitem .n{width:20px;flex:none;color:#9a9a9a;font-size:12px;font-variant-numeric:tabular-nums}
@@ -48,9 +62,10 @@ a{color:inherit;text-decoration:none}
 @keyframes pulse{0%{box-shadow:0 0 0 0 #ffd23f}15%{box-shadow:0 0 0 4px #ffd23f}100%{box-shadow:0 0 0 4px transparent}}
 
 /* ============ leaving sheet + toast ============ */
-.scrim{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.45);display:none;place-items:center;padding:16px}
-.scrim.on{display:grid}
-.sheet{width:min(420px,100%);background:#fff;color:#111;border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.scrim{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{width:min(420px,100%);background:#fff;color:#111;border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35);transform:translateY(10px) scale(.98);transition:transform .25s var(--ease)}
+.scrim.on .sheet{transform:none}
 .sheet h3{margin:0 0 4px;font-size:17px}
 .sheet .url{font-size:12px;color:#555;word-break:break-all;background:#f3f3f3;border-radius:8px;padding:8px 10px;margin:12px 0}
 .sheet p{margin:0 0 16px;font-size:13px;color:#444}
@@ -58,9 +73,10 @@ a{color:inherit;text-decoration:none}
 .sheet .btns>*{height:36px;padding:0 16px;border-radius:6px;font-weight:600;font-size:13px;display:inline-flex;align-items:center}
 .sheet .stay{background:#f0f0f0}
 .sheet .go{background:#0078d4;color:#fff}
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:96;background:#f2f2f2;color:#111;font-weight:600;font-size:13px;padding:10px 16px;border-radius:999px;transition:all .25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:96;background:#f2f2f2;color:#111;font-weight:600;font-size:13px;padding:10px 16px;border-radius:999px;transition:all .3s var(--ease);pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .toast.on{opacity:1;transform:translateX(-50%)}
-.adl{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.02em}
+.adl{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.adchoice{display:inline-grid;place-items:center;width:14px;height:14px;border-radius:2px;background:#00aecd;color:#fff;font-size:9px;font-weight:700;font-style:normal}
 
 /* ======================================================================
    COPILOT (dark)
@@ -70,11 +86,11 @@ a{color:inherit;text-decoration:none}
 .cp-side{background:#181818;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;padding:14px 8px 12px}
 .cp-brand{display:flex;align-items:center;justify-content:space-between;padding:4px 10px 18px;font-size:20px;font-weight:600}
 .cp-brand .ic{display:flex;gap:14px;color:#aaa}
-.cp-nav button,.cp-nav a{display:flex;align-items:center;gap:12px;width:100%;height:34px;padding:0 10px;border-radius:8px;font-size:14px;color:#ddd}
+.cp-nav button,.cp-nav a{display:flex;align-items:center;gap:12px;width:100%;height:34px;padding:0 10px;border-radius:8px;font-size:14px;color:#ddd;transition:background .15s}
 .cp-nav button:hover,.cp-nav a:hover{background:#262626}
 .cp-chats{margin-top:18px}
 .cp-chats h5{margin:0 10px 6px;font-size:12px;font-weight:500;color:#8c8c8c}
-.cp-chat{display:flex;align-items:center;width:100%;height:34px;padding:0 10px;border-radius:8px;font-size:14px;color:#ddd;text-align:left}
+.cp-chat{display:flex;align-items:center;width:100%;height:34px;padding:0 10px;border-radius:8px;font-size:14px;color:#ddd;text-align:left;transition:background .15s}
 .cp-chat:hover{background:#262626}
 .cp-chat.on{background:#2c2c2c}
 .cp-chat span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -84,100 +100,116 @@ a{color:inherit;text-decoration:none}
 .cp-main{position:relative;display:flex;flex-direction:column;min-width:0;height:100vh}
 .cp-top{height:52px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px;color:#cfcfcf;font-size:14px}
 .cp-top .r{display:flex;gap:16px;color:#aaa}
-.cp-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3a3a3a transparent}
+.cp-scroll{flex:1;overflow-y:auto;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#3a3a3a transparent}
 .cp-col{max-width:780px;margin:0 auto;padding:8px 24px 40px}
 .cp-foot{flex:none;padding:0 24px 10px}
-.cp-composer{max-width:780px;margin:0 auto;display:flex;align-items:center;gap:12px;height:62px;padding:0 12px 0 18px;border-radius:999px;background:#212121;box-shadow:inset 0 0 0 1px #3a3a3a}
+.cp-composer{max-width:780px;margin:0 auto;display:flex;align-items:center;gap:12px;height:62px;padding:0 12px 0 18px;border-radius:999px;background:#212121;box-shadow:inset 0 0 0 1px #3a3a3a;transition:box-shadow .2s}
+.cp-composer:focus-within{box-shadow:inset 0 0 0 1px #5a5a5a}
 .cp-composer input{flex:1;background:none;border:0;outline:0;color:#eee;font:inherit;font-size:15px}
 .cp-composer input::placeholder{color:#9a9a9a}
 .cp-composer .voice{width:40px;height:40px;border-radius:50%;background:#333;display:grid;place-items:center}
 .cp-disc{text-align:center;font-size:12px;color:#8c8c8c;margin:8px 0 2px}
-
-/* home */
-.cp-home{max-width:780px;margin:0 auto;padding:12vh 24px 30px}
+.cp-home{max-width:780px;margin:0 auto;padding:12vh 24px 30px;animation:up .5s var(--ease)}
 .cp-home h1{font-size:30px;font-weight:500;margin:0 0 26px;letter-spacing:-.01em;color:#f2f2f2}
 .cp-home .lbl{font-size:13px;color:#9a9a9a;margin:30px 0 12px;display:flex;align-items:center;gap:8px}
 .puw{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.puw button{display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 16px 16px;border-radius:16px;background:#232323;box-shadow:inset 0 0 0 1px #313131;min-height:116px;transition:background .15s}
-.puw button:hover{background:#2a2a2a}
-.puw .from{font-size:12px;color:#8c8c8c;display:flex;align-items:center;gap:6px}
+.puw button{display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 16px 16px;border-radius:16px;background:#232323;box-shadow:inset 0 0 0 1px #313131;min-height:116px;transition:background .2s,transform .2s var(--ease)}
+.puw button:hover{background:#2a2a2a;transform:translateY(-2px)}
+.puw .from{font-size:12px;color:#8c8c8c}
 .puw .q{font-size:15px;line-height:1.35;color:#f0f0f0}
 .puw .live{margin-top:auto;font-size:11px;color:#7fbfff;display:flex;align-items:center;gap:6px}
 .puw .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#4aa3ff}
-
-/* chat */
-.msg-u{display:flex;justify-content:flex-end;margin:22px 0 26px}
+.msg-u{display:flex;justify-content:flex-end;margin:22px 0 26px;animation:up .35s var(--ease)}
 .msg-u div{background:#2e2e2e;border-radius:12px;padding:10px 16px;font-size:15px;max-width:80%}
 .msg-c{font-size:15.5px;line-height:1.65;color:#e6e6e6}
 .msg-c p{margin:0 0 14px}
 .msg-c b{color:#fff;font-weight:600}
 .msg-c .ctx{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#9a9a9a;background:#262626;border-radius:999px;padding:3px 10px;margin-bottom:14px}
 .pick{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:start;margin:18px 0 22px;padding-bottom:22px;border-bottom:1px solid #2c2c2c}
-.pick:last-of-type{border-bottom:0}
 .pick .fw{border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px #2f2f2f}
 .pick .fcap{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#9a9a9a;margin-top:6px}
 .pick .fcap .adl{color:#bdbdbd}
 .pick h4{margin:2px 0 4px;font-size:17px;font-weight:600;color:#fff}
 .pick .best{display:inline-block;font-size:12px;color:#7fbfff;margin-bottom:8px}
-.pick ul{margin:6px 0 10px;padding-left:18px}
+.pick ul{margin:6px 0 12px;padding-left:18px}
 .pick li{margin:2px 0}
-.pick .now{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#bdbdbd;background:#262626;border-radius:999px;padding:3px 10px}
+.pick .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pick .now{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#bdbdbd;background:#262626;border-radius:999px;padding:4px 10px}
 .pick .now b{color:#fff}
+.srbtn{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 6px 0 8px;border-radius:12px;background:#262626;box-shadow:inset 0 0 0 1px #3a3a3a;font-size:14px;color:#f2f2f2;transition:background .2s,transform .2s var(--ease)}
+.srbtn:hover{background:#303030;transform:translateY(-1px)}
+.srbtn .th{width:44px;height:28px;border-radius:7px;overflow:hidden;position:relative;background:#111;flex:none}
+.srbtn .go{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:#3a3a3a}
 .verdict{background:#222;border-radius:12px;padding:12px 16px;margin:6px 0 14px;font-size:14.5px}
 .verdict div{margin:3px 0}
 .sp-note{font-size:12px;color:#8c8c8c;margin:4px 0 18px}
 .qopts{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
-.qopts button{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:999px;background:#232323;box-shadow:inset 0 0 0 1px #3a3a3a;font-size:14px;color:#f0f0f0}
+.qopts button{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:999px;background:#232323;box-shadow:inset 0 0 0 1px #3a3a3a;font-size:14px;color:#f0f0f0;transition:background .2s}
 .qopts button:hover{background:#2c2c2c}
-.qopts .dot{width:8px;height:8px;border-radius:50%}
 .typing{display:inline-flex;gap:5px;padding:8px 0}
 .typing i{width:7px;height:7px;border-radius:50%;background:#777;animation:blink 1.2s infinite}
 .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
-.reveal>*{opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.reveal>*{opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .reveal>.in{opacity:1;transform:none}
 
 /* showroom */
-.sr{position:absolute;inset:0;display:none;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:minmax(0,1fr);background:#111;z-index:5}
-.sr.on{display:grid}
-.sr-stage{position:relative;min-height:0;display:flex;flex-direction:column;min-width:0;padding:14px 16px 0;background:#0e0e0e}
+.sr{position:absolute;inset:0;display:none;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:minmax(0,1fr);background:#0e0e0e;z-index:5}
+.sr.on{display:grid;animation:vin .35s var(--ease)}
+.sr.on .sr-card{animation:srin .55s var(--ease)}
+@keyframes srin{from{opacity:0;transform:translateY(24px) scale(.985)}to{opacity:1;transform:none}}
+.sr-stage{position:relative;min-height:0;display:flex;flex-direction:column;min-width:0;padding:14px 16px 0}
 .sr-bar{display:flex;align-items:center;gap:16px;color:#bbb;height:30px;margin-bottom:8px}
-.sr-bar .x{margin-left:auto;width:30px;height:30px;border-radius:8px;display:grid;place-items:center}
+.sr-bar .x{margin-left:auto;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;transition:background .15s}
 .sr-bar .x:hover{background:#262626}
 .sr-wrap{position:relative;flex:1;min-height:0;display:flex;justify-content:center}
-.sr-card{position:relative;width:min(600px,100%);height:100%;overflow-y:auto;scroll-behavior:smooth;scrollbar-width:none;background:#f1f1ef;color:#141414;border-radius:20px 20px 0 0;padding:26px 22px 120px}
+.sr-card{position:relative;width:min(620px,100%);height:100%;overflow-y:auto;scroll-behavior:smooth;scrollbar-width:none;background:#f1f1ef;color:#141414;border-radius:22px 22px 0 0;padding:16px 16px 130px}
 .sr-card::-webkit-scrollbar{display:none}
-.sr-card h2{margin:0 0 4px;font-size:24px;font-weight:500;letter-spacing:-.01em}
-.sr-card .sub{margin:0 0 16px;color:#555;font-size:14px}
+.sr-brand{position:relative;border-radius:16px;overflow:hidden;background:#0d0d0d;color:#fff;padding:22px 22px 20px;display:flex;align-items:center;gap:18px;margin-bottom:14px}
+.sr-brand .lg{height:46px;width:auto;flex:none}
+.sr-brand .t{min-width:0}
+.sr-brand h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.01em}
+.sr-brand p{margin:3px 0 0;font-size:13.5px;color:#bdbdbd}
+.sr-brand .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.sr-brand .tags span{font-size:11.5px;color:#ddd;background:rgba(255,255,255,.1);border-radius:999px;padding:3px 10px}
 .sr-hero{border-radius:16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.12)}
-.sr-now{display:flex;align-items:center;gap:10px;margin:12px 2px 2px;font-size:13px;color:#444}
-.sr-now b{color:#111}
-.sr-now .sw{display:flex;gap:6px;margin-left:auto}
-.sr-now .sw span{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.2);opacity:.5}
+.sr-now{display:flex;align-items:center;gap:10px;margin:12px 4px 2px;font-size:13px;color:#444}
+.sr-now b{color:#111;transition:opacity .3s}
+.sr-now .sw{display:flex;gap:7px;margin-left:auto}
+.sr-now .sw span{width:15px;height:15px;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.2);opacity:.55;transition:all .25s var(--ease)}
 .sr-now .sw span.on{opacity:1;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #111}
-.sr-sec{margin-top:26px}
-.sr-sec h3{margin:0 0 12px;font-size:19px;font-weight:500}
+.sr-sec{margin-top:28px}
+.sr-sec h3{margin:0 4px 12px;font-size:20px;font-weight:500;letter-spacing:-.01em}
+.sr-sec .lead{margin:-6px 4px 14px;font-size:13.5px;color:#555}
+.sr-fin{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sr-fin button{text-align:left;border-radius:14px;background:#fff;padding:8px 8px 10px;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:box-shadow .25s var(--ease),transform .25s var(--ease)}
+.sr-fin button:hover{transform:translateY(-2px)}
+.sr-fin button.on{box-shadow:0 0 0 2px #111}
+.sr-fin .im{position:relative;aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#e7e5e1}
+.sr-fin .im img{object-fit:cover}
+.sr-fin b{display:block;font-size:13.5px;margin:8px 4px 0}
+.sr-fin span{display:block;font-size:12px;color:#666;margin:2px 4px 0}
 .sr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.sr-tile{border-radius:14px;background:#fff;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.sr-tile .tv{height:96px;border-radius:10px;margin-bottom:12px;position:relative;overflow:hidden}
-.sr-tile b{display:block;font-size:14px;margin-bottom:4px}
-.sr-tile span{font-size:13px;color:#555;line-height:1.45}
-.sr-tile.on{box-shadow:0 0 0 2px #111}
+.sr-tile{border-radius:14px;overflow:hidden}
+.sr-tile .im{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#ddd;margin-bottom:10px}
+.sr-tile b{display:block;font-size:14.5px;margin:0 2px 4px}
+.sr-tile span{display:block;font-size:13px;color:#555;line-height:1.5;margin:0 2px}
 .sr-cta{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);display:flex;gap:10px;z-index:3}
-.sr-cta button{height:44px;padding:0 22px;border-radius:12px;background:#fff;color:#111;font-weight:600;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.18);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.sr-cta button{height:46px;padding:0 22px;border-radius:12px;background:#fff;color:#111;font-weight:600;font-size:14px;box-shadow:0 6px 22px rgba(0,0,0,.22);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;transition:transform .2s var(--ease)}
+.sr-cta button:hover{transform:translateY(-2px)}
 .sr-cta button.pri{background:#141414;color:#fff}
 .sr-spons{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:#888;display:flex;justify-content:center;align-items:center;gap:6px;z-index:3}
-.sr-arrows{position:absolute;right:calc(50% - 360px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
-.sr-arrows button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#bbb}
+.sr-arrows{position:absolute;right:calc(50% - 350px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
+.sr-arrows button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#bbb;transition:background .15s}
 .sr-arrows button:hover{background:#262626}
 .sr-chat{background:#1c1c1c;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;min-height:0}
 .sr-chat .head{height:44px;flex:none;display:flex;align-items:center;padding:0 16px;color:#aaa;font-size:13px;gap:8px}
-.sr-chat .body{flex:1;overflow-y:auto;padding:4px 18px 10px;scrollbar-width:thin;scrollbar-color:#3a3a3a transparent;font-size:14.5px;line-height:1.6;color:#e6e6e6}
+.sr-chat .body{flex:1;overflow-y:auto;scroll-behavior:smooth;padding:4px 18px 10px;scrollbar-width:thin;scrollbar-color:#3a3a3a transparent;font-size:14.5px;line-height:1.6;color:#e6e6e6}
 .sr-chat .body .msg-u{margin:10px 0 14px}
 .sr-chat .body .msg-u div{font-size:14px;padding:8px 14px}
-.sr-chat .body p{margin:0 0 12px}
+.sr-chat .body p{margin:0 0 12px;animation:up .35s var(--ease)}
 .sr-sugs{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin:6px 0 12px}
-.sr-sugs button{max-width:92%;text-align:left;padding:8px 14px;border-radius:12px;background:#232323;box-shadow:inset 0 0 0 1px #3a3a3a;font-size:13.5px;line-height:1.4;color:#f0f0f0}
+.sr-sugs button{max-width:92%;text-align:left;padding:8px 14px;border-radius:12px;background:#232323;box-shadow:inset 0 0 0 1px #3a3a3a;font-size:13.5px;line-height:1.4;color:#f0f0f0;transition:background .2s}
 .sr-sugs button:hover{background:#2c2c2c}
 .sr-chat .note{font-size:11.5px;color:#8c8c8c;text-align:center;padding:6px 16px}
 .sr-chat .cp-composer{height:50px;margin:0 12px 12px;padding:0 8px 0 14px}
@@ -186,142 +218,189 @@ a{color:inherit;text-decoration:none}
 /* ======================================================================
    MSN (dark)
    ====================================================================== */
-#v-msn{background:#202020;color:#f2f2f2}
-.msn-hdr{height:64px;display:flex;align-items:center;gap:24px;padding:0 24px;max-width:1360px;margin:0 auto}
-.msn-logo{display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;letter-spacing:-.02em}
-.msn-search{flex:1;max-width:800px;margin:0 auto;height:44px;border-radius:999px;background:#fff;color:#555;display:flex;align-items:center;gap:12px;padding:0 18px;font-size:15px}
-.msn-hdr .r{display:flex;align-items:center;gap:18px}
-.msn-hdr .signin{height:36px;padding:0 16px;border-radius:6px;box-shadow:inset 0 0 0 1px #555;font-size:14px}
-.msn-wrap{max-width:1300px;margin:0 auto;padding:0 32px 80px}
-.msn-top{display:grid;grid-template-columns:260px minmax(0,1fr);background:#fff;color:#111;max-width:970px;margin:6px auto 0;min-height:260px}
-.msn-top .flick{height:100%;aspect-ratio:auto;min-height:260px}
-.msn-top .tx{padding:22px 28px;display:flex;flex-direction:column;justify-content:center}
-.msn-top .dom{font-size:13px;color:#555;margin-bottom:8px}
-.msn-top h2{margin:0 0 10px;font-size:28px;line-height:1.2;font-weight:700}
-.msn-top .now{font-size:13px;color:#333;margin-bottom:14px}
-.msn-top .now b{color:#002f6c}
-.msn-top .cta{align-self:flex-start;height:36px;padding:0 18px;border-radius:4px;background:#002f6c;color:#fff;font-weight:600;font-size:13px}
-.spons{max-width:970px;margin:4px auto 0;text-align:right;font-size:11px;color:#bbb}
-.msn-tabs{display:flex;align-items:center;gap:6px;margin:18px 0 14px;flex-wrap:wrap}
-.msn-tabs button{height:36px;padding:0 14px;border-radius:8px;font-size:14px;color:#e6e6e6}
-.msn-tabs button.on{background:#3a3a3a;color:#8ec5ff;box-shadow:inset 0 0 0 1px #4a4a4a}
+#v-msn{background:#1f1f1f;color:#f2f2f2}
+.msn-hdr{height:72px;display:flex;align-items:center;gap:24px;padding:0 32px;max-width:1400px;margin:0 auto}
+.msn-logo{display:flex;align-items:center;gap:6px;font-size:25px;font-weight:600;letter-spacing:-.02em}
+.msn-search{flex:1;max-width:800px;margin:0 auto;height:46px;border-radius:999px;background:#fff;color:#666;display:flex;align-items:center;gap:12px;padding:0 20px;font-size:16px}
+.msn-hdr .r{display:flex;align-items:center;gap:22px}
+.msn-hdr .signin{height:38px;padding:0 16px;border-radius:6px;box-shadow:inset 0 0 0 1px #5a5a5a;font-size:14px}
+.msn-wrap{max-width:1240px;margin:0 auto;padding:0 0 90px}
+.lb{max-width:970px;margin:4px auto 0}
+.lb .unit{display:grid;grid-template-columns:250px minmax(0,1fr);background:#fff;color:#111;height:250px;overflow:hidden}
+.lb .flick{height:250px;width:250px}
+.lb .tx{padding:20px 32px;display:flex;flex-direction:column;justify-content:center}
+.lb .dom{font-size:13px;color:#666;margin-bottom:8px}
+.lb h2{margin:0 0 10px;font-size:30px;line-height:1.18;font-weight:700;letter-spacing:-.01em}
+.lb .now{font-size:13.5px;color:#444;margin-bottom:14px}
+.lb .now b{color:#002f6c}
+.lb .cta{align-self:flex-start;height:38px;padding:0 20px;border-radius:4px;background:#002f6c;color:#fff;font-weight:600;font-size:13.5px;transition:background .2s}
+.lb .cta:hover{background:#00408f}
+.lb .sp{text-align:right;font-size:11px;color:#bbb;margin-top:4px}
+.msn-tabs{display:flex;align-items:center;gap:6px;margin:22px 0 16px;flex-wrap:wrap}
+.msn-tabs button{height:36px;padding:0 14px;border-radius:8px;font-size:14px;color:#e6e6e6;transition:background .15s}
+.msn-tabs button:hover{background:#2c2c2c}
+.msn-tabs button.on{background:#333;color:#8ec5ff;box-shadow:inset 0 0 0 1px #4a4a4a}
 .msn-tabs .sp{flex:1}
-.msn-tabs .ol{height:36px;padding:0 14px;border-radius:999px;box-shadow:inset 0 0 0 1px #777;font-size:14px}
+.msn-tabs .ol{height:36px;padding:0 16px;border-radius:999px;box-shadow:inset 0 0 0 1px #777;font-size:14px;display:inline-flex;align-items:center;gap:8px}
 .msn-tabs .ol.b{box-shadow:inset 0 0 0 1px #8ec5ff;color:#8ec5ff;font-weight:600}
-.msn-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.mcard{position:relative;background:#2b2b2b;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:300px}
-.mcard.hero{grid-column:span 2;min-height:300px}
-.mcard .ph{flex:1;min-height:170px;position:relative}
-.mcard .ov{position:absolute;inset:auto 0 0 0;padding:18px 22px;background:linear-gradient(transparent,rgba(0,0,0,.78))}
-.mcard .src{display:flex;align-items:center;gap:6px;font-size:12px;color:#d0d0d0;margin-bottom:6px}
-.mcard .src i{width:16px;height:16px;border-radius:3px;background:#555;display:inline-block}
-.mcard h3{margin:0;font-size:17px;line-height:1.3;font-weight:600}
-.mcard.hero h3{font-size:26px}
-.mcard .tx{padding:12px 14px 14px}
-.mcard .ft{display:flex;gap:16px;font-size:12px;color:#bbb;margin-top:10px}
-.mcard.ad .flick{flex:none}
-.mcard.ad .tx h3{font-size:15px}
-.mcard.ad .ft{justify-content:space-between}
-.mcard.ad .ft .cta{color:#8ec5ff;font-weight:600}
-.mcard.disp{background:#000;justify-content:flex-start}
-.mcard.disp .ad-head{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;font-size:11px;color:#aaa}
-.mcard.disp .ad-foot{padding:10px 12px 12px;font-size:13px;color:#eee}
-.mcard.disp .ad-foot b{display:block;font-size:15px;margin-bottom:2px}
-.toplist{padding:14px 16px}
-.toplist h4{margin:0 0 12px;font-size:15px;display:flex;align-items:center;gap:8px}
-.toplist .it{padding:10px 0;border-top:1px solid #3a3a3a;font-size:14px;line-height:1.35}
-.toplist .it small{display:block;color:#aaa;font-size:11.5px;margin-bottom:3px}
-.wx{background:linear-gradient(160deg,#1d3b66,#0f2342);padding:14px 16px}
+.mg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;grid-auto-rows:minmax(310px,auto)}
+.mc{position:relative;background:#2a2a2a;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.mc.w2{grid-column:span 2}
+.mc .ph{position:relative;flex:1;min-height:170px;background:#333;overflow:hidden}
+.mc .ov{position:absolute;left:0;right:0;bottom:0;padding:60px 22px 16px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
+.pub{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#d6d6d6}
+.pub i{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:8.5px;font-weight:800;font-style:normal;color:#fff;flex:none}
+.mc h3{margin:6px 0 0;font-size:17px;line-height:1.3;font-weight:600}
+.mc.w2 h3{font-size:27px;line-height:1.22;max-width:90%}
+.mc .tx{padding:12px 14px 12px}
+.reac{display:flex;align-items:center;gap:16px;font-size:12.5px;color:#c9c9c9;margin-top:10px}
+.reac span{display:inline-flex;align-items:center;gap:5px}
+.dots{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:4px;z-index:3;background:rgba(0,0,0,.35);border-radius:999px;padding:5px 8px}
+.dots i{width:6px;height:4px;border-radius:2px;background:rgba(255,255,255,.45);transition:all .3s var(--ease)}
+.dots i.on{width:18px;background:#fff}
+.carr{position:absolute;top:50%;transform:translateY(-50%);width:26px;height:44px;background:rgba(0,0,0,.45);color:#fff;display:grid;place-items:center;z-index:3;border-radius:4px;opacity:.85;transition:opacity .2s}
+.carr:hover{opacity:1}
+.carr.l{left:0}.carr.r{right:0}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .9s var(--ease)}
+.slide.on{opacity:1}
+.local{position:absolute;right:16px;bottom:16px;z-index:3;font-size:12px;background:rgba(0,0,0,.55);border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:5px}
+.mc.ad .flick{flex:none}
+.mc.ad .tx h3{font-size:15px;margin-top:6px}
+.mc.ad .ft{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:12px;color:#bbb}
+.mc.ad .ft .cta{color:#8ec5ff;font-weight:600}
+.mc.disp{background:#0b0b0b}
+.mc.disp .ah{display:flex;justify-content:flex-end;align-items:center;gap:6px;padding:5px 6px;font-size:10.5px;color:#aaa}
+.mc.disp .af{padding:8px 12px 10px;font-size:12.5px;color:#ddd;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mc.disp .af b{display:block;font-size:14px;color:#fff}
+.mc.disp .af button{height:30px;padding:0 12px;border-radius:4px;background:#fff;color:#111;font-weight:600;font-size:12px;flex:none}
+.mc.disp .spf{font-size:11px;color:#9a9a9a;padding:0 12px 8px}
+.tl{padding:16px 16px 10px}
+.tl h4{margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:8px}
+.tl .it{display:block;padding:9px 0;border-top:1px solid #3a3a3a;font-size:14px;line-height:1.35;transition:color .15s}
+.tl .it:first-of-type{border-top:0}
+.tl .it:hover{color:#8ec5ff}
+.tl .it .pub{margin-bottom:3px;font-size:11.5px;color:#aaa}
+.wx{background:linear-gradient(165deg,#2c5a8f 0%,#1b3a63 55%,#132b4c 100%);padding:14px 16px;display:flex;flex-direction:column}
 .wx .t{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600}
-.wx .now{display:flex;align-items:center;gap:12px;margin:12px 0}
-.wx .now b{font-size:44px;font-weight:600}
+.wx .now{display:flex;align-items:center;gap:10px;margin:14px 0 4px}
+.wx .now b{font-size:46px;font-weight:600;letter-spacing:-.02em}
+.wx .now sup{font-size:16px;font-weight:500}
+.wx .d{font-size:13px;color:#d3e3f6;display:flex;align-items:center;gap:6px}
 .wx .days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-size:12px;text-align:center;margin-top:auto}
-.wx .days div{background:rgba(255,255,255,.08);border-radius:8px;padding:8px 0}
-.msn-sec{margin:28px 0 12px;font-size:18px;font-weight:600}
+.wx .days div{background:rgba(255,255,255,.08);border-radius:8px;padding:8px 0;line-height:1.5}
+.wx .days b{display:block;font-weight:600}
+.wx .ff{margin:10px auto 0;font-size:12.5px;background:rgba(255,255,255,.12);border-radius:999px;padding:5px 14px}
+.msn-sec{margin:30px 0 14px;font-size:19px;font-weight:600;display:flex;align-items:center;gap:10px}
 
 /* ======================================================================
    BING HOME
    ====================================================================== */
-#v-bing{background:radial-gradient(60% 50% at 18% 60%,#e9e6e0 0%,transparent 70%),radial-gradient(50% 60% at 82% 40%,#a7a29a 0%,transparent 70%),linear-gradient(160deg,#6d6a65 0%,#3e3c39 55%,#7f7a72 100%);color:#fff;padding-bottom:80px}
-.bh-hdr{height:64px;display:flex;align-items:center;gap:22px;padding:0 24px;font-size:14px}
+#v-bing{position:relative;color:#fff;padding-bottom:90px;background:#3b3b38;isolation:isolate}
+#v-bing .bgimg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+#v-bing .bgimg img{width:100%;height:100%;object-fit:cover;transform:scale(1.03);filter:saturate(.9)}
+#v-bing .bgimg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.05) 30%,rgba(0,0,0,.1))}
+.bh-hdr{height:64px;display:flex;align-items:center;gap:22px;padding:0 24px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .mslogo{display:grid;grid-template-columns:12px 12px;gap:2px;flex:none}
 .mslogo i{width:12px;height:12px;display:block}
-.bh-nav{display:flex;gap:30px;margin-left:50px}
-.bh-hdr .r{margin-left:auto;display:flex;align-items:center;gap:24px}
-.bh-search{max-width:850px;margin:30px auto 0;padding:0 24px}
-.bh-sbox{height:52px;border-radius:999px;background:#fff;color:#333;display:flex;align-items:center;gap:12px;padding:0 18px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.bh-nav{display:flex;gap:34px;margin-left:56px}
+.bh-hdr .r{margin-left:auto;display:flex;align-items:center;gap:26px}
+.bh-hdr .r .ic{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center}
+.bh-search{max-width:850px;margin:26px auto 0;padding:0 24px}
+.bh-sbox{height:52px;border-radius:999px;background:#fff;color:#333;display:flex;align-items:center;gap:14px;padding:0 18px;box-shadow:0 4px 22px rgba(0,0,0,.22);transition:box-shadow .2s}
+.bh-sbox:focus-within{box-shadow:0 6px 28px rgba(0,0,0,.3)}
 .bh-sbox input{flex:1;border:0;outline:0;font:inherit;font-size:16px;color:#111;background:none}
 .bh-chips{display:flex;gap:18px;margin:24px 0 0}
-.bh-chips button{height:42px;padding:0 18px;border-radius:999px;background:rgba(255,255,255,.82);color:#222;font-size:14px;display:inline-flex;align-items:center;gap:8px}
-.bh-feed{max-width:960px;margin:18px auto 0;padding:12px;border-radius:14px;background:rgba(255,255,255,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.bh-news{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
-.bh-news a{border-radius:6px;overflow:hidden;background:#222;color:#fff}
-.bh-news .tt{font-size:13px;font-weight:600;padding:8px 10px;background:#1d1d1d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bh-news .ph{height:88px}
+.bh-chips button{height:42px;padding:0 18px;border-radius:999px;background:rgba(243,243,243,.86);color:#222;font-size:14px;display:inline-flex;align-items:center;gap:8px;backdrop-filter:blur(8px);transition:background .2s}
+.bh-chips button:hover{background:#fff}
+.bh-feed{max-width:948px;margin:20px auto 0;padding:12px;border-radius:12px;background:rgba(235,235,235,.62);backdrop-filter:blur(22px) saturate(1.2);-webkit-backdrop-filter:blur(22px) saturate(1.2);box-shadow:0 10px 40px rgba(0,0,0,.18);color:#111}
+.strip{position:relative;margin-bottom:12px}
+.strip .tr{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth}
+.strip .tr::-webkit-scrollbar{display:none}
+.strip a{flex:0 0 calc((100% - 32px)/5);scroll-snap-align:start;border-radius:6px;overflow:hidden;background:#1d1d1d;color:#fff}
+.strip .tt{font-size:13px;font-weight:600;padding:8px 10px;background:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip .ph{position:relative;height:90px;overflow:hidden;background:#333}
+.sarr{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:44px;border-radius:6px;background:rgba(40,40,40,.82);color:#fff;display:grid;place-items:center;z-index:2;transition:background .2s}
+.sarr:hover{background:#111}
+.sarr.l{left:-6px}.sarr.r{right:-6px}
 .bh-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
 .bh-row.top{grid-template-columns:2fr 1fr}
-.bcard{background:#fff;color:#111;border-radius:8px;overflow:hidden;position:relative;display:flex;flex-direction:column}
-.bcard.story{min-height:300px;color:#fff}
-.bcard.story .ph{position:absolute;inset:0}
-.bcard.story .ov{position:relative;margin-top:auto;padding:16px 18px;background:linear-gradient(transparent,rgba(0,0,0,.75))}
-.bcard.story h3{margin:4px 0 0;font-size:24px;line-height:1.25}
-.bcard.wxb{background:linear-gradient(170deg,#24456f,#14294a);color:#fff;padding:14px}
-.bcard .adcap{padding:10px 12px 12px}
-.bcard .adcap .row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px}
-.bcard .adcap h4{margin:0;font-size:15px;line-height:1.3}
-.bcard .adcap .vn{font-size:12px;color:#444;margin-top:6px}
-.bcard .adcap .vn b{color:#0067b8}
-.bcard .tx{padding:12px}
-.bcard .tx h4{margin:0 0 6px;font-size:15px}
+.bc{position:relative;background:#fff;color:#111;border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.bc.hero{height:304px;color:#fff;background:#222}
+.bc.hero .ov{position:absolute;left:0;right:0;bottom:0;padding:70px 18px 14px;background:linear-gradient(transparent,rgba(0,0,0,.8));z-index:2}
+.bc.hero h3{margin:6px 0 0;font-size:25px;line-height:1.22;font-weight:700;max-width:92%}
+.bc.hero .pub{color:#eee}
+.bc.hero .reac{color:#eee}
+.play{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:2;box-shadow:0 0 0 2px rgba(255,255,255,.75);transition:transform .2s var(--ease)}
+.bc.hero:hover .play{transform:translate(-50%,-50%) scale(1.06)}
+.bc .ph{position:relative;overflow:hidden;background:#ddd}
+.bc .tx{padding:10px 12px 12px}
+.bc .tx .pub{color:#555}
+.bc .tx h4{margin:6px 0 0;font-size:15.5px;line-height:1.32}
+.bc .tx .reac{color:#666}
+.bc.wxb{background:linear-gradient(170deg,#2b5a91 0%,#1a3a64 60%,#122a4a 100%);color:#fff;padding:14px;height:304px}
+.bc .adcap{padding:9px 12px 12px}
+.bc .adcap .rw{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#666}
+.bc .adcap h4{margin:4px 0 0;font-size:15px;line-height:1.3}
+.bc .adcap .vn{font-size:12.5px;color:#444;margin-top:6px}
+.bc .adcap .vn b{color:#0067b8;transition:opacity .3s}
 .games{padding:12px}
-.games h4{margin:0 0 10px;font-size:15px}
+.games .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:15px;font-weight:600}
 .games .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.games .g div{aspect-ratio:1/1;border-radius:8px}
+.games .g a{display:block}
+.games .g .im{position:relative;aspect-ratio:1/1;border-radius:8px;overflow:hidden;background:#ddd}
+.games .g span{display:block;font-size:11.5px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#333}
 
 /* ======================================================================
    BING SERP
    ====================================================================== */
 #v-serp{background:#fff;color:#111}
 .sr-hdr{display:flex;align-items:center;gap:24px;padding:20px 32px 0}
-.sr-sbox{width:min(640px,60vw);height:46px;border-radius:999px;box-shadow:0 0 0 1px #dcdcdc,0 2px 6px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;padding:0 18px}
+.sr-sbox{width:min(640px,60vw);height:46px;border-radius:999px;box-shadow:0 0 0 1px #dcdcdc,0 2px 6px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;padding:0 18px;transition:box-shadow .2s}
+.sr-sbox:focus-within{box-shadow:0 0 0 1px #c4c4c4,0 3px 10px rgba(0,0,0,.12)}
 .sr-sbox input{flex:1;border:0;outline:0;font:inherit;font-size:16px}
-.sr-hdr .r{margin-left:auto;display:flex;align-items:center;gap:16px;color:#444;font-size:14px}
-.sr-tabs{display:flex;gap:28px;padding:16px 0 0 calc(32px + 40px);border-bottom:1px solid #e5e5e5;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:#555}
-.sr-tabs span{padding-bottom:10px;display:inline-flex;align-items:center;gap:6px}
+.sr-hdr .r{margin-left:auto;display:flex;align-items:center;gap:14px;color:#444;font-size:14px}
+.sr-tabs{display:flex;gap:28px;padding:16px 0 0 72px;border-bottom:1px solid #e5e5e5;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:#555}
+.sr-tabs span{padding-bottom:10px;display:inline-flex;align-items:center;gap:6px;cursor:default}
 .sr-tabs span.on{color:#111;box-shadow:inset 0 -3px 0 #111}
-.sr-body{display:grid;grid-template-columns:minmax(0,720px) 400px;gap:40px;padding:22px 32px 80px calc(32px + 40px)}
+.sr-body{display:grid;grid-template-columns:minmax(0,720px) 400px;gap:40px;padding:22px 32px 90px 72px;animation:up .45s var(--ease)}
 .sr-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sr-sec-h h2{margin:0;font-size:22px;font-weight:600}
 .sr-sec-h small{font-size:12px;color:#555}
 .pcar{position:relative}
-.ptrack{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px}
+.ptrack{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px;scroll-behavior:smooth}
 .ptrack::-webkit-scrollbar{display:none}
-.pcard{flex:0 0 150px;scroll-snap-align:start;border-radius:12px;box-shadow:0 0 0 1px #e1e1e1;overflow:hidden;background:#fff;display:flex;flex-direction:column}
-.pcard.fl{flex-basis:230px;box-shadow:0 0 0 1px #c9d9ee}
-.pcard .im{aspect-ratio:1/1;background:#f4f4f4;display:grid;place-items:center;position:relative}
+.pcard{flex:0 0 150px;scroll-snap-align:start;border-radius:12px;box-shadow:0 0 0 1px #e1e1e1;overflow:hidden;background:#fff;display:flex;flex-direction:column;transition:box-shadow .2s}
+.pcard:hover{box-shadow:0 0 0 1px #c8c8c8,0 6px 16px rgba(0,0,0,.08)}
+.pcard.fl{flex-basis:230px}
+.pcard .im{aspect-ratio:1/1;background:#f4f4f4;position:relative;overflow:hidden}
 .pcard .tag{position:absolute;left:8px;top:8px;background:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;z-index:2;box-shadow:0 0 0 1px #ddd}
 .pcard .tx{padding:8px 10px 12px;font-size:13.5px;line-height:1.35}
-.pcard .nm{color:#4007a2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pcard .nm{color:#4007a2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 .pcard .pr{font-weight:700;color:#006d21;margin-top:4px}
 .pcard .pr s{color:#777;font-weight:400;font-size:12px;margin-left:4px}
 .pcard .st{color:#444;font-size:12.5px}
 .pcard .vn{font-size:12px;color:#555;margin-top:4px}
 .pcard .vn b{color:#111}
-.pnext{position:absolute;right:-14px;top:110px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:grid;place-items:center}
+.pcard .dts{display:flex;gap:3px;justify-content:center;position:absolute;bottom:6px;left:0;right:0;z-index:2}
+.pcard .dts i{width:5px;height:5px;border-radius:50%;background:#ccc}
+.pcard .dts i:first-child{background:#555}
+.pnext{position:absolute;right:-14px;top:110px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:grid;place-items:center;font-size:20px;transition:transform .2s}
+.pnext:hover{transform:scale(1.06)}
 .org{margin-top:34px}
 .org .r{margin-bottom:26px}
 .org .site{display:flex;align-items:center;gap:10px;font-size:13px;color:#444}
-.org .site i{width:26px;height:26px;border-radius:50%;background:#eee;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;color:#555}
+.org .site i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#fff}
 .org .site small{display:block;color:#666;font-size:12px}
 .org h3{margin:6px 0 4px;font-size:20px;font-weight:400;color:#4007a2}
+.org h3:hover{text-decoration:underline;cursor:pointer}
 .org p{margin:0;font-size:14px;color:#444;line-height:1.55}
 .dect{margin-top:30px}
 .dect h2{margin:0 0 2px;font-size:20px;font-weight:600}
 .dect .sub{font-size:13px;color:#555;margin-bottom:12px}
 .dect .g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .dect .g div{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;box-shadow:0 0 0 1px #e1e1e1;font-size:13px}
-.dect .g div .im{width:52px;height:52px;flex:none;background:#f3f3f3;border-radius:8px;display:grid;place-items:center}
-.dect .g div b{display:block;font-size:13.5px}
+.dect .g .im{position:relative;width:54px;height:54px;flex:none;background:#f3f3f3;border-radius:8px;overflow:hidden}
+.dect .g b{display:block;font-size:13.5px}
 .mma{border-radius:14px;box-shadow:0 0 0 1px #e1e1e1;overflow:hidden}
 .mma .hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;font-size:12px;color:#555}
 .mma .tx{padding:12px 14px 16px}
@@ -331,29 +410,22 @@ a{color:inherit;text-decoration:none}
 .mma .vn{font-size:13px;color:#444;margin-bottom:12px}
 .mma .vn b{color:#111}
 .mma .btns{display:flex;gap:8px}
-.mma .btns button{height:34px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:inset 0 0 0 1px #c9c9c9}
+.mma .btns button{height:34px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:inset 0 0 0 1px #c9c9c9;transition:background .2s}
 .mma .btns .pri{background:#0067b8;color:#fff;box-shadow:none}
+.mma .btns .pri:hover{background:#005a9e}
 .rel{margin-top:22px;border-radius:14px;box-shadow:0 0 0 1px #e1e1e1;padding:14px}
 .rel h4{margin:0 0 10px;font-size:15px}
-.rel a{display:block;padding:7px 0;font-size:14px;color:#4007a2;border-top:1px solid #f0f0f0}
-
-/* photo placeholders */
-.p1{background:linear-gradient(160deg,#8aa1b5,#4d6478 60%,#2c3a47)}
-.p2{background:linear-gradient(160deg,#c9b38d,#8d6f4c 60%,#4a3826)}
-.p3{background:linear-gradient(160deg,#9cb7a3,#557564 60%,#2b4034)}
-.p4{background:linear-gradient(160deg,#b8a6c7,#6e5b86 60%,#3a2c4c)}
-.p5{background:linear-gradient(160deg,#c4a19a,#8a5b52 60%,#4b2c27)}
-.p6{background:linear-gradient(160deg,#a3bccb,#5f8197 60%,#33495a)}
-.ph::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 30% 30%,rgba(255,255,255,.18),transparent 70%)}
-.ph{position:relative}
+.rel a{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;color:#4007a2;border-top:1px solid #f0f0f0}
+.rel a:hover{text-decoration:underline}
 
 /* responsive */
 @media (max-width:1100px){
-  .msn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mg{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sr-body{grid-template-columns:minmax(0,1fr);padding-left:24px;padding-right:24px}
   .sr-tabs{padding-left:24px}
   .sr{grid-template-columns:minmax(0,1fr) 300px}
   .sr-arrows{display:none}
+  .msn-wrap{padding:0 20px 90px}
 }
 @media (max-width:860px){
   .cp{grid-template-columns:minmax(0,1fr)}
@@ -361,18 +433,18 @@ a{color:inherit;text-decoration:none}
   .puw{grid-template-columns:1fr}
   .pick{grid-template-columns:1fr}
   .pick .fw{max-width:360px}
-  .sr{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 42%}
+  .sr{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 40%}
   .sr-chat{border-left:0;border-top:1px solid #2a2a2a}
   .sr-cta{bottom:36px}
   .sr-cta button{height:36px;padding:0 12px;font-size:12.5px;border-radius:10px}
-  .sr-card{padding:18px 16px 110px}
+  .sr-fin{grid-template-columns:1fr 1fr}
   .bh-nav{display:none}
-  .bh-news{grid-template-columns:repeat(2,1fr)}
+  .strip a{flex-basis:calc((100% - 8px)/2)}
   .bh-row,.bh-row.top{grid-template-columns:1fr}
-  .msn-top{grid-template-columns:1fr}
-  .msn-top .flick{aspect-ratio:1/1}
-  .msn-grid{grid-template-columns:1fr}
-  .mcard.hero{grid-column:auto}
+  .lb .unit{grid-template-columns:1fr;height:auto}
+  .lb .flick{width:100%;height:auto}
+  .mg{grid-template-columns:1fr}
+  .mc.w2{grid-column:auto}
   .msn-hdr .r,.msn-tabs .sp,.msn-tabs .ol{display:none}
   .dect .g{grid-template-columns:1fr}
   .gpill{right:12px;bottom:12px}
@@ -419,7 +491,6 @@ a{color:inherit;text-decoration:none}
         <p class="cp-disc">AI-generated content may be incorrect</p>
       </div>
 
-      <!-- Showroom (Copilot Showroom ads) -->
       <div class="sr" id="sr">
         <div class="sr-stage">
           <div class="sr-bar">
@@ -451,33 +522,38 @@ a{color:inherit;text-decoration:none}
 <!-- ================= MSN ================= -->
 <section class="view" id="v-msn">
   <header class="msn-hdr">
-    <a class="msn-logo" href="#/msn"><svg width="30" height="26" viewBox="0 0 30 26"><path d="M4 22L11 4l7 12" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 14l5-10 7 18" fill="none" stroke="#ec4899" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/></svg>msn</a>
+    <a class="msn-logo" href="#/msn" aria-label="MSN"><svg width="34" height="28" viewBox="0 0 34 28"><defs><linearGradient id="mg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3dd2ff"/><stop offset="1" stop-color="#2b6cff"/></linearGradient><linearGradient id="mg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7ad9"/><stop offset="1" stop-color="#8f4dff"/></linearGradient><linearGradient id="mg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd25e"/><stop offset="1" stop-color="#ff7a3d"/></linearGradient></defs><path d="M3 23C6 13 8 6 13 5c3-.6 4 3 4 6" fill="none" stroke="url(#mg1)" stroke-width="5" stroke-linecap="round"/><path d="M17 11c1-4 3-6 6-6 4 0 6 6 7 16" fill="none" stroke="url(#mg2)" stroke-width="5" stroke-linecap="round"/><circle cx="17" cy="22" r="3.2" fill="url(#mg3)"/></svg>msn</a>
     <div class="msn-search"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#555" stroke-width="1.6"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg>Search the web</div>
-    <div class="r"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#ddd" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg><button class="signin">Sign in</button></div>
+    <div class="r"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#ddd" stroke-width="1.5"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg><button class="signin">Sign in</button></div>
   </header>
   <div class="msn-wrap">
-    <div id="msn-top" data-anchor="msn-top"></div>
-    <nav class="msn-tabs"><button class="on">Discover</button><button>News</button><button>Sports</button><button>Play</button><button>Money</button><button>Weather</button><button>Watch</button><button>Shopping</button><span class="sp"></span><button class="ol">Personalize</button><button class="ol b">Make MSN my homepage</button></nav>
-    <div class="msn-grid" id="msn-grid"></div>
-    <div class="msn-sec">More for you</div>
-    <div class="msn-grid" id="msn-grid2"></div>
+    <div id="msn-lb"></div>
+    <nav class="msn-tabs"><button class="on">Discover</button><button>News</button><button>Sports</button><button>Play</button><button>Money</button><button>Weather</button><button>Watch</button><button>Shopping</button><span class="sp"></span><button class="ol"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.2 5.2L18 8l-4.4 3.8L15 18l-5-3-5 3 1.4-6.2L2 8l5.8-.8z"/></svg>Personalize</button><button class="ol b">Make MSN my homepage</button></nav>
+    <div class="mg" id="msn-g1"></div>
+    <div class="msn-sec">For you</div>
+    <div class="mg" id="msn-g2"></div>
   </div>
 </section>
 
 <!-- ================= BING HOME ================= -->
 <section class="view" id="v-bing">
+  <div class="bgimg"><img class="fi" id="bing-bg" alt=""></div>
   <header class="bh-hdr">
     <a href="#/bing" class="mslogo" aria-label="Microsoft Bing"><i style="background:#f25022"></i><i style="background:#7fba00"></i><i style="background:#00a4ef"></i><i style="background:#ffb900"></i></a>
-    <nav class="bh-nav"><span>Images</span><span>Videos</span><a href="#/bing/search">Shopping</a><span>Maps</span><a href="#/msn">News</a><span>···</span></nav>
-    <div class="r"><span>Sign in</span><span>Rewards</span><a href="#/copilot">Copilot</a></div>
+    <nav class="bh-nav"><span>Images</span><span>Videos</span><a href="#" onclick="goSearch('long range headphones');return false">Shopping</a><span>Maps</span><a href="#/msn">News</a><span>···</span></nav>
+    <div class="r"><span style="display:flex;align-items:center;gap:10px">Sign in <span class="ic"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#555" stroke-width="1.5"><circle cx="10" cy="7" r="3.5"/><path d="M3.5 17c1-3.5 3.6-5 6.5-5s5.5 1.5 6.5 5"/></svg></span></span><span style="display:flex;align-items:center;gap:10px">Rewards <span class="ic"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#555" stroke-width="1.5"><path d="M6 3h8v5a4 4 0 0 1-8 0zM10 12v3M7 17h6"/></svg></span></span><a href="#/copilot" style="display:flex;align-items:center;gap:8px">Copilot</a><svg width="20" height="20" viewBox="0 0 20 20" stroke="#fff" stroke-width="1.6"><path d="M3 5h14M3 10h14M3 15h14"/></svg></div>
   </header>
   <div class="bh-search">
     <form class="bh-sbox" onsubmit="event.preventDefault();goSearch(this.q.value)">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#555" stroke-width="1.6"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg>
       <input name="q" placeholder="Search the web" autocomplete="off" aria-label="Search the web">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0067b8" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0067b8" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0067b8" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/></svg>
     </form>
-    <div class="bh-chips"><button onclick="location.hash='#/copilot'">Ask Copilot</button><button onclick="goSearch('long range headphones')">Try: long range headphones</button></div>
+    <div class="bh-chips">
+      <button onclick="location.hash='#/copilot'"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#333" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="3"/><circle cx="8" cy="8" r="1.6"/><path d="M4 15l4-4 3 3 2-2 3 3"/></svg>Image creator</button>
+      <button onclick="location.hash='#/copilot'"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#333" stroke-width="1.5"><path d="M4 16l1-4 8-8 3 3-8 8zM12 5l3 3"/></svg>Text creator</button>
+    </div>
   </div>
   <div class="bh-feed" id="bh-feed"></div>
 </section>
@@ -489,14 +565,16 @@ a{color:inherit;text-decoration:none}
     <form class="sr-sbox" onsubmit="event.preventDefault();goSearch(this.q.value)">
       <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#555" stroke-width="1.6"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg>
       <input name="q" id="serp-q" autocomplete="off" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/></svg>
     </form>
-    <div class="r"><span>5</span><span style="width:28px;height:28px;border-radius:50%;background:#e8eef7;display:inline-block"></span></div>
+    <div class="r"><span>5</span><span style="width:26px;height:26px;border-radius:50%;background:#1a64d6;display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.8"><path d="M6 3h8v5a4 4 0 0 1-8 0zM10 12v3M7 17h6"/></svg></span><span style="width:30px;height:30px;border-radius:50%;background:#eef1f5;display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#666" stroke-width="1.5"><circle cx="10" cy="7" r="3.5"/><path d="M3.5 17c1-3.5 3.6-5 6.5-5s5.5 1.5 6.5 5"/></svg></span></div>
   </header>
-  <nav class="sr-tabs"><span class="on">ALL</span><span onclick="location.hash='#/copilot'" style="cursor:pointer">AI MODE</span><span>SHOPPING</span><span>IMAGES</span><span>VIDEOS</span><span>MAPS</span><span>NEWS</span><span>MORE</span></nav>
+  <nav class="sr-tabs"><span class="on">ALL</span><span onclick="location.hash='#/copilot'" style="cursor:pointer"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2l2 5 5 1-4 3 1 6-4-3-4 3 1-6-4-3 5-1z"/></svg>AI MODE</span><span>SHOPPING</span><span>IMAGES</span><span>VIDEOS</span><span>MAPS</span><span>NEWS</span><span>⋮ MORE</span></nav>
   <div class="sr-body" id="serp-body"></div>
 </section>
 
-<!-- ================= chrome shared ================= -->
+<!-- ================= shared chrome ================= -->
 <button class="gpill" id="gpill" onclick="toggleGuide()" aria-expanded="false">Ad formats <i id="gcount"></i></button>
 <div class="gscrim" id="gscrim" onclick="toggleGuide(false)"></div>
 <div class="gpanel" id="gpanel" role="dialog" aria-label="Ad formats"></div>
@@ -513,19 +591,57 @@ a{color:inherit;text-decoration:none}
 
 <script>
 /* =====================================================================
-   FLICK TAGS: one ad.js per creative, run in its own iframe exactly as
-   delivered (orientation meta, ExitApi + clickTag, optional AD_CONFIG).
+   Photos: Unsplash (free licence), hotlinked at the size each slot needs
+   ===================================================================== */
+const P = {
+  fox:"1474511320723-9a56873867b5", tide:"1762624822556-921847c110d9", harbor:"1595973641416-35ae8a6eb1d3", beach:"1615571022219-eb45cf7faa9d",
+  mtn:"1611840155466-ac6bfe5feeac", leaves:"1509838174235-432f709c7bfd", city:"1496588152823-86ff7695e68f", snowroad:"1609700930660-8573f28f8e2f",
+  soup:"1476718406336-bb5a9690ee2a", pan:"1551978155-63d44a16fe24", stadium:"1522778119026-d647f0596c20", meteor:"1692035473930-3a51eea5412e",
+  museum:"1554907984-15263bfd63bd", festival:"1638132704795-6bb223151bf7", trail:"1501554728187-ce583db33af7", market:"1526399743290-f73cb4022f48",
+  commute:"1532105956626-9569c03602f6", office:"1568992687947-868a62a9f521", dog:"1534361960057-19889db9621e", coffee:"1509042239860-f550ce710b93",
+  runner:"1571008887538-b36bb32f4571", chess:"1560174038-da43ac74f01b", puzzle:"1591040092219-081fb773589c", racecar:"1625231334168-35067f8853ed",
+  dice:"1629760946220-5693ee4c46ac", hpy:"1505740420928-5e560c06d30e", hpg:"1618366712010-f4ae9c647dcb", hpw:"1491927570842-0261e477d937",
+  hpgr:"1610196600828-517131fddddd", ski:"1565992441121-4367c2967103", lighthouse:"1522679056866-8dbbc8774a9d", rain:"1488034976201-ffbaa99cbf5c",
+  ev:"1593941707874-ef25b8b4a92b", plane:"1436491865332-7a61a109cc05", vineyard:"1563514227147-6d2ff665a6a0", pumpkin:"1506917728037-b6af01a7d403",
+  pizza:"1513104890138-7c749659a591", library:"1568667256549-094345857637", concert:"1459749411175-04bf5292ceea", shopping:"1483985988355-763728e1935b",
+  bakery:"1556742059-47b93231f536", elk:"1629837270594-fabe06c83d5d", rocket:"1517976487492-5750f3195933", basketball:"1546519638-68e109498ffc",
+  tennis:"1545151414-8a948e1ea54f",
+  // car details
+  mbCabin:"1639060015191-57b7c025941d", mbRear:"1643142314404-32a911f3ede2", mbStar:"1701705625512-a59a79836300", mbRoad:"1610099610040-ab19f3a5ec35",
+  bWheel:"1572291941065-2d9b854f1e10", bLeather:"1563986642669-49162177a0bc", bClock:"1649711558232-237fa0b65b30", bBadge:"1729513408155-3846ac6deddf",
+  cLight:"1768024175226-8674c14c3a36", cCockpit:"1768024175229-f7258b883544", cEsc:"1767749995458-b0927324e4d0", cSeats:"1691157415383-9e85455a0f9e"
+};
+const U = (k,w=800,h) => `https://images.unsplash.com/photo-${P[k]||k}?w=${w}${h?`&h=${h}`:""}&fit=crop&auto=format&q=72`;
+const img = (src, alt="", cls="cover") => `<img class="fi ${cls}" src="${src}" alt="${alt}" loading="lazy" decoding="async">`;
+const CAD = id => `https://storage.googleapis.com/bucket-fi-production-apps-0672ab2d/original/images/${id}.webp`;
+
+/* publishers shown on stories (fictional) */
+const PUB = {
+  coast:["Coastline Daily","CD","#0f6cbd"], metro:["Metro Ledger","ML","#b4262a"], wk:["The Weekend Post","WP","#5b3fb3"],
+  field:["Field & Trail","FT","#2f7d32"], kitchen:["Kitchen Notes","KN","#d9480f"], sports:["Sports Desk 24","24","#1d1d1d"],
+  sky:["Skywatch","SW","#1c5fa8"], travel:["Travel Brief","TB","#0b8a8a"], pulse:["City Pulse","CP","#c2185b"], wire:["Market Wire","MW","#37474f"]
+};
+const pub = (k, t) => { const p=PUB[k]; return `<div class="pub"><i style="background:${p[2]}">${p[1]}</i>${p[0]}${t?` · ${t}`:""}</div>`; };
+const ICO = {
+  up:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l3-6c1.4 0 2 1 2 2.2V8h4.2c1 0 1.8 1 1.6 2l-1.2 5.6c-.2.8-.9 1.4-1.7 1.4H6zM3 9h3v8H3z"/></svg>`,
+  dn:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 11l-3 6c-1.4 0-2-1-2-2.2V12H4.8c-1 0-1.8-1-1.6-2l1.2-5.6C4.6 3.6 5.3 3 6.1 3H14zM17 11h-3V3h3z"/></svg>`,
+  cm:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12v9H8l-4 3z"/></svg>`
+};
+const reac = (u,c) => `<div class="reac"><span>${ICO.up}${u}</span><span>${ICO.dn}</span><span>${ICO.cm}${c}</span></div>`;
+
+/* =====================================================================
+   FLICK TAGS: one ad.js per creative, run in its own iframe as delivered
    ===================================================================== */
 const BRANDS = {
   merc: { name:"Mercedes-Benz", short:"Mercedes-Benz S-Class", url:"https://www.mbusa.com/en/vehicles/class/s-class/sedan", domain:"mbusa.com",
     src:"https://native-ads.appless.workers.dev/6a9bc07393e71f3ec9b12c81_i3pdeq/ad.js", dark:true,
-    variants:[{n:"White",c:"#f2f2f0"},{n:"Green",c:"#4f8a83"},{n:"Black",c:"#1b1b1d"}] },
+    variants:[{n:"White",c:"#f2f2f0",img:"assets/merc-white.webp"},{n:"Green",c:"#4f8a83",img:"assets/merc-green.webp"},{n:"Black",c:"#1b1b1d",img:"assets/merc-black.webp"}] },
   bentley: { name:"Bentley", short:"Bentley Torcal", url:"https://www.bentleymotors.com/en/models/torcal.html", domain:"bentleymotors.com",
     src:"https://native-ads.appless.workers.dev/6a9bc07393e71f3ec9b12c81_xogy7s/ad.js", fontScan:true, transparent:true,
-    variants:[{n:"White",c:"#ecebe6"},{n:"Olive",c:"#8a8c3a"},{n:"Blue",c:"#1f4fa3"}] },
+    variants:[{n:"White",c:"#ecebe6",img:"assets/bentley-white.webp"},{n:"Olive",c:"#9a9d3c",img:"assets/bentley-olive.webp"},{n:"Blue",c:"#1f4fa3",img:"assets/bentley-blue.webp"}] },
   cadillac: { name:"Cadillac", short:"Cadillac", url:"https://www.cadillac.com/", domain:"cadillac.com",
     src:"https://flicks.flamapp.live/z70k1k/ad.js", adConfig:true, dark:true,
-    variants:[{n:"Optiq",c:"#c0392b"},{n:"Celestiq",c:"#5a6170"},{n:"Escalade-V",c:"#e9e9e9"}] },
+    variants:[{n:"Optiq",c:"#c0392b",img:CAD("wab2wtdhjqvp93u3awoo9729")},{n:"Celestiq",c:"#26407a",img:CAD("rivsbyktpswgcbta3xoih3rb")},{n:"Escalade-V",c:"#e9e9e9",img:CAD("iwiak68bxr6ga8ysyjz7i81p")}] },
   sony: { name:"Sony", short:"Sony WH-CH720N", url:"https://electronics.sony.com/", domain:"electronics.sony.com",
     src:"https://native-ads-dev.appless.workers.dev/6a96c6969e74536944c4167f_dj5rq6/ad.js",
     variants:[{n:"Black"},{n:"White"},{n:"Blue"}] },
@@ -591,6 +707,9 @@ function openSheet(brand, url){
 }
 function closeSheet(){ document.getElementById("scrim").classList.remove("on"); }
 addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeSheet(); toggleGuide(false); } });
+// fade images in as they arrive
+document.addEventListener("load", e=>{ const t=e.target; if(t.tagName==="IMG") t.classList.add("ld"); }, true);
+function settleImgs(){ document.querySelectorAll("img.fi:not(.ld)").forEach(i=>{ if(i.complete && i.naturalWidth) i.classList.add("ld"); }); }
 
 /* ================= Flick slots ================= */
 let SLOTS = {};
@@ -601,28 +720,23 @@ function flick(id, brand, cls=""){
 }
 function variantOf(id){ const s=SLOTS[id], b=BRANDS[s.brand]; return b.variants[s.variant] || b.variants[0]; }
 function shop(id){ const s=SLOTS[id]; if(!s) return; openSheet(s.brand, variantOf(id).url || BRANDS[s.brand].url); }
-const onSwitch = {}; // per-slot hooks (showroom, chat)
+const onSwitch = {};
 function syncVariant(id){
   const s=SLOTS[id]; if(!s) return;
-  document.querySelectorAll(`[data-vname="${id}"]`).forEach(el=>el.textContent = variantOf(id).n);
+  document.querySelectorAll(`[data-vname="${id}"]`).forEach(el=>{ el.style.opacity=0; setTimeout(()=>{ el.textContent = variantOf(id).n; el.style.opacity=1; },150); });
   document.querySelectorAll(`[data-sync="${id}"]`).forEach(el=>el.classList.toggle("on", +el.dataset.i===s.variant));
   if(onSwitch[id]) onSwitch[id](s.variant);
 }
-
 let io = null;
+const live = ".view.on .flick[data-slot], #sr.on .flick[data-slot]";
 function observeFlicks(){
   if(io) io.disconnect();
-  io = new IntersectionObserver(entries=>{
-    entries.forEach(en=>{ en.isIntersecting ? mount(en.target) : unmount(en.target); });
-  }, { rootMargin:"900px 0px 900px 0px" });
-  document.querySelectorAll(".view.on .flick[data-slot], #sr.on .flick[data-slot]").forEach(h=>io.observe(h));
-  requestAnimationFrame(mountVisible); setTimeout(mountVisible, 80);
+  io = new IntersectionObserver(entries=>{ entries.forEach(en=>{ en.isIntersecting ? mount(en.target) : unmount(en.target); }); }, { rootMargin:"900px 0px 900px 0px" });
+  document.querySelectorAll(live).forEach(h=>io.observe(h));
+  requestAnimationFrame(mountVisible); setTimeout(mountVisible, 80); setTimeout(settleImgs, 50);
 }
 function mountVisible(){
-  document.querySelectorAll(".view.on .flick[data-slot], #sr.on .flick[data-slot]").forEach(h=>{
-    const r=h.getBoundingClientRect();
-    if(r.width && r.bottom > -900 && r.top < innerHeight+900) mount(h);
-  });
+  document.querySelectorAll(live).forEach(h=>{ const r=h.getBoundingClientRect(); if(r.width && r.bottom > -900 && r.top < innerHeight+900) mount(h); });
 }
 setInterval(mountVisible, 1500);
 function mount(host){
@@ -632,10 +746,9 @@ function mount(host){
   f.title=`${BRANDS[s.brand].name} Flick: interactive video`; f.setAttribute("allow","autoplay; fullscreen"); f.setAttribute("scrolling","no");
   f.srcdoc=tagDoc(id, BRANDS[s.brand]);
   host.prepend(f);
-  // No ready signal after 9s: lift the loader so a playing Flick is never hidden, and say so.
   s.timer=setTimeout(()=>{
     if(s.ready||s.error||!s.mounted) return;
-    host.querySelector(".fstate")?.classList.add("hide");
+    host.classList.add("rdy"); host.querySelector(".fstate")?.classList.add("hide");
     if(!host.querySelector(".fwarn")) host.insertAdjacentHTML("beforeend",`<span class="fwarn">No ready signal from Flick yet</span>`);
     console.warn("[flicks] no vertex-ready from", id, BRANDS[s.brand].src);
   },9000);
@@ -643,7 +756,7 @@ function mount(host){
 function unmount(host){
   const id=host.dataset.slot, s=SLOTS[id]; if(!s || !s.mounted || s.error) return;
   clearTimeout(s.timer); s.mounted=false; s.ready=false; s.variant=0;
-  host.querySelector("iframe")?.remove(); host.querySelector(".fwarn")?.remove();
+  host.classList.remove("rdy"); host.querySelector("iframe")?.remove(); host.querySelector(".fwarn")?.remove();
   const st=host.querySelector(".fstate"); if(st) st.className="fstate load";
   syncVariant(id);
 }
@@ -652,15 +765,14 @@ window.addEventListener("message", e=>{
   const s=SLOTS[m.slot]; if(!s) return;
   const host=document.querySelector(`.flick[data-slot="${m.slot}"]`);
   if(!host || e.source!==host.querySelector("iframe")?.contentWindow) return;
-  if(m.type==="ready"){ s.ready=true; clearTimeout(s.timer); host.querySelector(".fstate")?.classList.add("hide"); host.querySelector(".fwarn")?.remove(); }
+  if(m.type==="ready"){ s.ready=true; clearTimeout(s.timer); host.classList.add("rdy"); host.querySelector(".fstate")?.classList.add("hide"); host.querySelector(".fwarn")?.remove(); }
   else if(m.type==="error"){
     s.error=true; clearTimeout(s.timer); console.error("[flicks] render error", m.slot, m.msg);
     const st=host.querySelector(".fstate"); st.className="fstate err";
     st.innerHTML=`<div><b>Flick failed to load</b>${esc(m.msg)}<br><br>If this file is open inside a preview window, open it directly in Chrome. Previews block ad scripts.</div>`;
   }
-  else if(m.type==="switch"){ s.variant=Math.max(0,Math.min(m.diff, BRANDS[s.brand].variants.length-1)); syncVariant(m.slot); }
+  else if(m.type==="switch"){ const v=Math.max(0,Math.min(m.diff, BRANDS[s.brand].variants.length-1)); if(v!==s.variant){ s.variant=v; syncVariant(m.slot); } }
   else if(m.type==="cta"){
-    // The creative can fire its CTA up to three ways (exit, link, event); act once.
     const now=Date.now(); if(now-s.lastCta<900) return; s.lastCta=now;
     openSheet(s.brand, m.url || variantOf(m.slot).url || BRANDS[s.brand].url);
   }
@@ -671,15 +783,14 @@ window.addEventListener("message", e=>{
    ===================================================================== */
 const CAR_Q = "Best premium luxury cars for my use cases";
 const PICKS = [
-  { brand:"merc", slot:"cop-merc", best:"Best for being driven", title:"Mercedes-Benz S-Class (2026)",
+  { brand:"merc", slot:"cop-merc", best:"Best for being driven", title:"Mercedes-Benz S-Class (2026)", sr:"Mercedes-Benz S-Class virtual showroom",
     pts:["Rear seat built for chauffeur days: quiet, soft ride, screens for each passenger","Strongest all-round comfort and safety tech in the class","Tap a colour in the Flick to see the S-Class in that finish"] },
-  { brand:"bentley", slot:"cop-bentley", best:"Best for craftsmanship", title:"Bentley Torcal",
+  { brand:"bentley", slot:"cop-bentley", best:"Best for craftsmanship", title:"Bentley Torcal", sr:"Bentley Torcal virtual showroom",
     pts:["Cabins finished by hand in Crewe, England","Effortless grand-touring power for the weekends you drive yourself","Compare three finishes inside the Flick"] },
-  { brand:"cadillac", slot:"cop-cad", best:"Best if you want an EV option", title:"Cadillac",
+  { brand:"cadillac", slot:"cop-cad", best:"Best if you want an EV option", title:"Cadillac", sr:"Cadillac virtual showroom",
     pts:["One lineup that covers compact electric (Optiq), hand-built electric (Celestiq) and full-size performance (Escalade-V)","Switch models inside the Flick to compare them on the same drive"] }
 ];
-function brandDot(b){ return {merc:"#c9c9c9",bentley:"#4a7a5a",cadillac:"#c0392b"}[b]; }
-
+const ARROW = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3l5 5-5 5"/></svg>`;
 function copilotHome(){
   return `<div class="cp-home">
     <h1>Hey Aditya, what's on your mind?</h1>
@@ -691,7 +802,6 @@ function copilotHome(){
     </div>
   </div>`;
 }
-
 function carAnswer(){
   const picks = PICKS.map((p,i)=>{
     const b=BRANDS[p.brand];
@@ -702,7 +812,10 @@ function carAnswer(){
         <span class="best">${i+1}. ${p.best}</span>
         <h4>${p.title}</h4>
         <ul>${p.pts.map(t=>`<li>${t}</li>`).join("")}</ul>
-        <span class="now">Showing <b data-vname="${p.slot}">${b.variants[0].n}</b></span>
+        <div class="row">
+          <button class="srbtn" onclick="openShowroom('${p.brand}')"><span class="th">${img(b.variants[0].img, "")}</span>${p.sr}<span class="go">${ARROW}</span></button>
+          <span class="now">Showing <b data-vname="${p.slot}">${b.variants[0].n}</b></span>
+        </div>
       </div>
     </div>`;
   }).join("");
@@ -710,21 +823,19 @@ function carAnswer(){
     <span class="ctx"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3.5V8l3 2"/><circle cx="8" cy="8" r="6"/></svg>Continuing from S-Class Versus Competitors</span>
     <p>Going by what you shared earlier, you are driven during the week, drive yourself at weekends, and care most about a quiet cabin and current tech. These three fit that best, each for a different reason:</p>
     ${picks}
-    <div class="verdict"><div><b>Most comfortable to be driven in:</b> Mercedes-Benz S-Class</div><div><b>Most special to own:</b> Bentley</div><div><b>Widest range, including electric:</b> Cadillac</div></div>
+    <div class="verdict"><div><b>Most comfortable to be driven in:</b> Mercedes-Benz S-Class</div><div><b>Most special to own:</b> Bentley Torcal</div><div><b>Widest range, including electric:</b> Cadillac</div></div>
     <p class="sp-note">Sponsored content never influences Copilot responses.</p>
     <p>Want to look closer? I can open a virtual showroom for any of them.</p>
-    <div class="qopts">
-      ${PICKS.map(p=>`<button onclick="openShowroom('${p.brand}')"><span class="dot" style="background:${brandDot(p.brand)}"></span>Build a virtual showroom for ${BRANDS[p.brand].short==="Mercedes-Benz S-Class"?"Mercedes-Benz":BRANDS[p.brand].name}</button>`).join("")}
-    </div>
+    <div class="qopts">${PICKS.map(p=>`<button onclick="openShowroom('${p.brand}')">${p.sr}</button>`).join("")}</div>
   </div>`;
 }
-
 let cpStage = "home";
 function renderCopilot(stage, animate){
   cpStage = stage;
   const sc=document.getElementById("cp-scroll");
   document.getElementById("chat-cars").classList.toggle("on", stage!=="home");
-  if(stage==="home"){ sc.innerHTML = copilotHome(); SLOTS={}; observeFlicks(); return; }
+  if(stage==="home"){ SLOTS={}; sc.innerHTML = copilotHome(); observeFlicks(); return; }
+  SLOTS={};
   const user = `<div class="cp-col"><div class="msg-u"><div>${CAR_Q}</div></div>`;
   if(!animate){
     sc.innerHTML = user + carAnswer() + `</div>`;
@@ -735,8 +846,7 @@ function renderCopilot(stage, animate){
   setTimeout(()=>{
     sc.querySelector(".cp-col").lastElementChild.outerHTML = carAnswer();
     observeFlicks();
-    const parts=[...document.querySelectorAll("#car-answer>*")];
-    parts.forEach((el,i)=>setTimeout(()=>el.classList.add("in"), 120+i*260));
+    [...document.querySelectorAll("#car-answer>*")].forEach((el,i)=>setTimeout(()=>el.classList.add("in"), 120+i*240));
   }, 900);
 }
 function startCars(){ location.hash = "#/copilot/cars"; }
@@ -749,107 +859,90 @@ function cpSend(v){
 /* ---------- Showroom ---------- */
 const SHOW = {
   merc: {
-    title:"Mercedes-Benz S-Class", sub:"The 2026 S-Class. The benchmark luxury saloon, refreshed.",
-    sections:[
-      {h:"Built around the rear seat", tiles:[
-        ["Rear comfort","Reclining rear seats and a cabin tuned for quiet, so the back seat works as an office or a place to rest."],
-        ["Screens for every seat","Displays front and rear, so passengers control media and climate from where they sit."],
-        ["Ride","Smooth, settled ride at city and motorway speeds."],
-        ["Safety","A full suite of driver assistance and safety systems."]]},
-      {h:"Choose your finish", finish:true}
-    ],
+    title:"Mercedes-Benz S-Class", sub:"The 2026 S-Class. The benchmark luxury saloon, refreshed.", logo:"assets/merc-star.webp", tags:["Smooth ride","Executive comfort","Advanced technology"],
+    finH:"Choose your finish", finLead:"Tap a colour in the showroom above. The live car and these tiles stay in step.",
+    feat:{h:"Built around the rear seat", tiles:[
+      ["mbRear","Rear comfort","Reclining rear seats and a cabin tuned for quiet, so the back seat works as an office or a place to rest."],
+      ["mbCabin","Cabin","Wide screens and ambient light run across the dashboard."],
+      ["mbRoad","On the road","A smooth, settled ride at city and highway speeds."],
+      ["mbStar","Presence","The three-pointed star on a long, elegant bonnet."]]},
     cta:[["Make an enquiry",true],["Explore the S-Class lineup",false]],
-    intro:"Welcome to the Mercedes-Benz S-Class virtual showroom. The car on the left is live: tap any colour under it to see the S-Class in that finish. Ask me anything about the cabin, the ride or how to book a test drive.",
+    intro:"Welcome to the Mercedes-Benz S-Class virtual showroom. The car on the left is live: tap any colour under it to see the S-Class in that finish. Ask me anything about the cabin, the ride or booking a test drive.",
     sugs:[
-      ["Which colour suits a chauffeured car?","Most chauffeur fleets lean to black for a formal look; white and the green finish read more personal and show less dust in daily use. Tap each one in the showroom to compare them on the same car."],
+      ["Which colour suits a chauffeured car?","Most chauffeur fleets lean to black for a formal look; white and the green finish read more personal and show less dust day to day. Tap each in the showroom to compare them on the same car."],
       ["What is the rear seat like?","The rear is the S-Class's strongest point: reclining seats, its own screens and a very quiet cabin. Scroll the showroom to see the interior."],
-      ["Book a test drive near me","I'll hand you to Mercedes-Benz to pick a dealer and a time.","cta"]
-    ]
+      ["Book a test drive near me","I'll hand you to Mercedes-Benz to pick a dealer and a time.","cta"]]
   },
   bentley: {
-    title:"Bentley Torcal", sub:"Bentley. Beyond the ordinary.",
-    sections:[
-      {h:"Made by hand", tiles:[
-        ["Craft","Cabins finished by hand in Crewe, England."],
-        ["Materials","Leather, wood and metal chosen and fitted piece by piece."],
-        ["Grand touring","Effortless power for long weekend drives."],
-        ["Personal","Built to order, to your own specification."]]},
-      {h:"Choose your finish", finish:true}
-    ],
+    title:"Bentley Torcal", sub:"Bentley. Beyond the ordinary.", logo:"assets/bentley-logo.webp", tags:["Hand-finished","Grand touring","Built to order"],
+    finH:"Choose your finish", finLead:"White, olive or blue. Tap one in the showroom above and it follows here.",
+    feat:{h:"Made by hand", tiles:[
+      ["bWheel","Hand-finished cabin","Cabins finished by hand in Crewe, England."],
+      ["bLeather","Materials","Leather, wood and metal chosen and fitted piece by piece."],
+      ["bClock","Details","The small things are made to the same standard as the big ones."],
+      ["bBadge","Heritage","The winged B, on a car built to your own specification."]]},
     cta:[["Get in touch",true],["Explore the Bentley range",false]],
     intro:"Welcome to the Bentley Torcal virtual showroom. The car on the left is live: tap a finish under it to see the Torcal in white, olive or blue. Ask me about craftsmanship, ownership or speaking to a retailer.",
     sugs:[
       ["What makes a Bentley cabin different?","Each cabin is finished by hand in Crewe, with materials fitted piece by piece and most details chosen by the buyer."],
       ["Compare the three finishes","White is the classic choice, olive is the most distinctive and blue sits in between. Tap each in the showroom to see them on the same car and the same road."],
-      ["Get in touch with a retailer","I'll hand you to Bentley to find your nearest retailer.","cta"]
-    ]
+      ["Get in touch with a retailer","I'll hand you to Bentley to find your nearest retailer.","cta"]]
   },
   cadillac: {
-    title:"Cadillac", sub:"One lineup, three ways to arrive.",
-    sections:[
-      {h:"Compare the lineup", models:true},
-      {h:"Why Cadillac", tiles:[
-        ["Electric or V8","Pick all-electric or a supercharged V8 in the same showroom."],
-        ["Made to order","Celestiq is hand-built to each owner's specification."],
-        ["Space","Escalade-V gives full-size room for family and luggage."],
-        ["City size","Optiq is the compact, easy-to-park electric choice."]]}
-    ],
-    models:[
-      ["Optiq","Compact all-electric luxury SUV. Move into EV luxury."],
-      ["Celestiq","Hand-built, made-to-order electric flagship. Rare by design."],
-      ["Escalade-V","Full-size SUV with a supercharged V8. Command every road."]
-    ],
+    title:"Cadillac", sub:"One lineup, three ways to arrive.", logo:null, tags:["Optiq","Celestiq","Escalade-V"],
+    finH:"Compare the lineup", finLead:"Switch models in the showroom above to see each one on the same drive.",
+    models:["Compact all-electric luxury SUV. Move into EV luxury.","Hand-built, made-to-order electric flagship. Rare by design.","Full-size SUV with a supercharged V8. Command every road."],
+    feat:{h:"Why Cadillac", tiles:[
+      ["cLight","Lighting signature","Vertical light blades that read as Cadillac from a block away."],
+      ["cCockpit","Cockpit","A wide curved display across the dashboard."],
+      ["cEsc","Escalade presence","Full-size space for family, luggage and long trips."],
+      ["cSeats","Comfort","Supportive seats built for hours on the road."]]},
     cta:[["Explore your Cadillac",true],["Find a dealer",false]],
     intro:"Welcome to the Cadillac virtual showroom. The drive on the left is live: tap a model under it to switch between Optiq, Celestiq and Escalade-V on the same road. Ask me which one fits you.",
     sugs:[
       ["Optiq or Escalade-V for me?","Optiq if you want electric and easy city parking; Escalade-V if you want full-size space and V8 performance. Switch between them in the showroom to compare."],
       ["What is the Celestiq?","Celestiq is Cadillac's hand-built electric flagship, made to order for each owner."],
-      ["Find a Cadillac dealer near me","I'll hand you to Cadillac to find a dealer.","cta"]
-    ]
+      ["Find a Cadillac dealer near me","I'll hand you to Cadillac to find a dealer.","cta"]]
   }
 };
 let srBrand = null;
 function openShowroom(brand){ location.hash = "#/copilot/showroom/" + brand; }
 function closeShowroom(){ location.hash = "#/copilot/cars"; }
-function tileVisual(brand, i){
-  const g = {merc:["#2b2b2e","#5b5b60"], bentley:["#1f2a24","#566656"], cadillac:["#2a1f1f","#6a3b3b"]}[brand];
-  const ang = 120 + i*35;
-  return `<div class="tv" style="background:linear-gradient(${ang}deg,${g[0]},${g[1]})"></div>`;
-}
 function renderShowroom(brand){
   srBrand = brand;
   const b=BRANDS[brand], s=SHOW[brand], slot="sr-"+brand;
-  // drop the answer's Flicks so only one live player per brand runs
   Object.keys(SLOTS).forEach(k=>{ const h=document.querySelector(`.flick[data-slot="${k}"]`); if(h) unmount(h); });
   SLOTS = {};
   const sw = b.variants.map((v,i)=>`<span data-sync="${slot}" data-i="${i}" class="${i?"":"on"}" style="background:${v.c}"></span>`).join("");
-  const secs = s.sections.map(sec=>{
-    if(sec.finish) return `<div class="sr-sec"><h3>${sec.h}</h3><div class="sr-grid">${b.variants.map((v,i)=>`<div class="sr-tile" data-sync="${slot}" data-i="${i}"><div class="tv" style="background:radial-gradient(70% 70% at 50% 60%,${v.c},#1b1b1b)"></div><b>${v.n}</b><span>Tap ${v.n.toLowerCase()} in the showroom above.</span></div>`).join("")}</div></div>`;
-    if(sec.models) return `<div class="sr-sec"><h3>${sec.h}</h3><div class="sr-grid" style="grid-template-columns:1fr 1fr 1fr">${s.models.map((m,i)=>`<div class="sr-tile" data-sync="${slot}" data-i="${i}"><div class="tv" style="background:radial-gradient(70% 70% at 50% 60%,${b.variants[i].c},#1b1b1b)"></div><b>${m[0]}</b><span>${m[1]}</span></div>`).join("")}</div></div>`;
-    return `<div class="sr-sec"><h3>${sec.h}</h3><div class="sr-grid">${sec.tiles.map((t,i)=>`<div class="sr-tile"><b>${t[0]}</b><span>${t[1]}</span></div>`).join("")}</div></div>`;
-  }).join("");
+  const fin = b.variants.map((v,i)=>`<button data-sync="${slot}" data-i="${i}" class="${i?"":"on"}" onclick="srFocusHero('${v.n}')"><div class="im">${img(v.img, `${s.title} in ${v.n}`)}</div><b>${v.n}</b>${s.models?`<span>${s.models[i]}</span>`:""}</button>`).join("");
+  const feat = s.feat.tiles.map(t=>`<div class="sr-tile"><div class="im zoomimg">${img(U(t[0],700,525), t[1])}</div><b>${t[1]}</b><span>${t[2]}</span></div>`).join("");
+  const logo = s.logo ? `<img class="lg" src="${s.logo}" alt="${b.name}">` : `<svg class="lg" viewBox="0 0 60 60" width="46" height="46"><path d="M8 8h44l-4 30c-1 8-9 14-18 14S13 46 12 38z" fill="none" stroke="#d8d8d8" stroke-width="2.2"/><path d="M14 14h32M16 22h28M18 30h24" stroke="#bdbdbd" stroke-width="1.6"/></svg>`;
   document.getElementById("sr-card").innerHTML = `
-    <h2>${s.title}</h2><p class="sub">${s.sub}</p>
-    <div class="sr-hero" data-anchor="sr-${brand}">${flick(slot, brand)}</div>
+    <div class="sr-brand">${logo}<div class="t"><h2>${s.title}</h2><p>${s.sub}</p><div class="tags">${s.tags.map(t=>`<span>${t}</span>`).join("")}</div></div></div>
+    <div class="sr-hero" id="sr-hero" data-anchor="sr-${brand}">${flick(slot, brand)}</div>
     <div class="sr-now">Now showing <b data-vname="${slot}">${b.variants[0].n}</b><span class="sw">${sw}</span></div>
-    ${secs}`;
+    <div class="sr-sec"><h3>${s.finH}</h3><p class="lead">${s.finLead}</p><div class="sr-fin">${fin}</div></div>
+    <div class="sr-sec"><h3>${s.feat.h}</h3><div class="sr-grid">${feat}</div></div>`;
   document.getElementById("sr-card").scrollTop = 0;
   document.getElementById("sr-cta").innerHTML = s.cta.map(([t,pri])=>`<button class="${pri?"pri":""}" onclick="shop('${slot}')">${t} ${EXT}</button>`).join("");
-  const label = brand==="merc" ? "Mercedes-Benz" : b.name;
+  const label = brand==="merc" ? "Mercedes-Benz S-Class" : s.title;
   document.getElementById("sr-body").innerHTML = `
     <div class="msg-u"><div>Build a virtual showroom for ${label}</div></div>
     <p>${s.intro}</p>
     <div class="sr-sugs" id="sr-sugs">${s.sugs.map((q,i)=>`<button onclick="srSug(${i})">${q[0]}</button>`).join("")}</div>`;
-  // chat reacts when the viewer switches inside the Flick
   let lastSaid = 0;
   onSwitch[slot] = v => {
     if(v===lastSaid) return; lastSaid=v;
     const name = b.variants[v].n;
-    const line = brand==="cadillac" ? `You're looking at the ${name}. ${s.models[v][1]}` : `Now showing the ${name.toLowerCase()} finish. Want me to check availability for it?`;
-    srSay(line);
+    srSay(brand==="cadillac" ? `You're looking at the ${name}. ${s.models[v]}` : `Now showing the ${s.title} in ${name.toLowerCase()}. Want me to check availability for this finish?`);
   };
   document.getElementById("sr").classList.add("on"); document.body.classList.add("sr-open");
   observeFlicks();
+}
+function srFocusHero(name){
+  document.getElementById("sr-card").scrollTo({top:0, behavior:"smooth"});
+  const h=document.getElementById("sr-hero"); h.classList.remove("pulse"); void h.offsetWidth; h.classList.add("pulse");
+  toast(`Tap ${name} in the showroom to switch`);
 }
 function srSay(t, user){
   const body=document.getElementById("sr-body"), sugs=document.getElementById("sr-sugs");
@@ -860,110 +953,150 @@ function srSay(t, user){
 function srSug(i){
   const q=SHOW[srBrand].sugs[i];
   srSay(q[0], true);
-  document.querySelectorAll("#sr-sugs button")[i].remove();
-  setTimeout(()=>{ srSay(q[1]); if(q[2]==="cta") setTimeout(()=>shop("sr-"+srBrand), 600); }, 500);
+  const btn=[...document.querySelectorAll("#sr-sugs button")].find(x=>x.textContent===q[0]); btn?.remove();
+  setTimeout(()=>{ srSay(q[1]); if(q[2]==="cta") setTimeout(()=>shop("sr-"+srBrand), 700); }, 550);
 }
 function srAsk(v){
   v=(v||"").trim(); if(!v) return; srSay(v,true);
-  setTimeout(()=>srSay("Good question. In this demo, the suggested questions above are wired up. You can also tap inside the showroom to switch what you see."),500);
+  setTimeout(()=>srSay("Good question. In this demo the suggested questions are wired up, and you can tap inside the showroom to switch what you see."),550);
 }
 function srPage(d){ const c=document.getElementById("sr-card"); c.scrollBy({top:d*c.clientHeight*.8, behavior:"smooth"}); }
 
 /* =====================================================================
    MSN
    ===================================================================== */
-function msnStory(ph, src, title, hero){
-  return `<article class="mcard ${hero?"hero":""}"><div class="ph ${ph}"></div><div class="ov"><div class="src"><i></i>${src}</div><h3>${title}</h3></div></article>`;
+const MSN_HERO = [
+  {p:"tide", pub:"coast", t:"2h", h:"King tides push seawater into coastal streets for a third day", u:"1.2K", c:"318", local:true},
+  {p:"city", pub:"metro", t:"4h", h:"City backs late-night transit plan after two years of talks", u:"846", c:"201", local:true},
+  {p:"stadium", pub:"sports", t:"1h", h:"Late winner sends the home side into the cup final", u:"2.4K", c:"512"}
+];
+let heroT=null, heroI=0;
+function msnStory(p, pk, t, h, u, c, w2){
+  return `<article class="mc lift ${w2?"w2":""}"><div class="ph zoomimg">${img(U(p, w2?1200:600, w2?620:420), "")}</div>
+    <div class="tx">${pub(pk,t)}<h3>${h}</h3>${reac(u,c)}</div></article>`;
+}
+function msnPhoto(p, pk, t, h, u, c){
+  return `<article class="mc lift"><div class="ph zoomimg" style="flex:1">${img(U(p,600,620), "")}<div class="ov">${pub(pk,t)}<h3>${h}</h3>${reac(u,c)}</div></div></article>`;
 }
 function msnNative(id, brand, head, cta){
   const b=BRANDS[brand];
-  return `<article class="mcard ad" data-anchor="${id}">${flick(id, brand)}
-    <div class="tx"><div class="src" style="color:#bbb"><i style="background:#444"></i>${b.name}</div><h3>${head}</h3>
-    <div class="ft"><span class="adl">Sponsored</span><button class="cta" onclick="shop('${id}')">${cta}</button></div></div></article>`;
+  return `<article class="mc ad lift" data-anchor="${id}">${flick(id, brand)}
+    <div class="tx"><div class="pub"><i style="background:#555">${b.name[0]}</i>${b.name}</div><h3>${head}</h3>
+    <div class="ft"><span class="adl">Ad <span class="adchoice">i</span></span><button class="cta" onclick="shop('${id}')">${cta}</button></div></div></article>`;
 }
 function renderMSN(){
   SURFACE="MSN"; SLOTS={};
   const g=BRANDS.gap;
-  document.getElementById("msn-top").innerHTML = `<div class="msn-top">${flick("msn-top","gap")}
+  document.getElementById("msn-lb").innerHTML = `<div class="lb" data-anchor="msn-top"><div class="unit">${flick("msn-top","gap")}
     <div class="tx"><div class="dom">gap.com</div><h2>One fall wardrobe, three ways to wear it</h2>
     <div class="now">Showing: <b data-vname="msn-top">${g.variants[0].n}</b></div>
-    <button class="cta" onclick="shop('msn-top')">Shop the look</button></div></div><div class="spons">Sponsored</div>`;
-  document.getElementById("msn-grid").innerHTML =
-    msnStory("p1","City News · 2h","Coastal towns brace for a week of king tides", true) +
-    msnStory("p2","Travel · 10h","The quiet mountain towns worth a winter weekend") +
-    `<article class="mcard disp" data-anchor="msn-rail"><div class="ad-head"><span>Levi's</span><span class="adl">Ad</span></div>${flick("msn-rail","levis")}<div class="ad-foot"><b>Baggy Overalls</b>Turn it to see the fit from every side. <button onclick="shop('msn-rail')" style="color:#8ec5ff;font-weight:600">Shop now</button></div></article>` +
-    `<article class="mcard"><div class="toplist"><h4><span style="color:#f97316">●</span> Top stories</h4>
-      <div class="it"><small>World · 3h</small>Leaders meet ahead of next week's climate talks</div>
-      <div class="it"><small>Business · 4h</small>Holiday hiring starts earlier than last year</div>
-      <div class="it"><small>Tech · 5h</small>What changes in phone software this month</div>
-      <div class="it"><small>Science · 6h</small>A clear night for this week's meteor shower</div></div></article>` +
+    <button class="cta" onclick="shop('msn-top')">Shop the look</button></div></div><div class="sp">Sponsored</div></div>`;
+  const hero = `<article class="mc w2" id="msn-hero" style="grid-row:span 1">
+      <div class="ph" style="flex:1">${MSN_HERO.map((s,i)=>`<div class="slide ${i?"":"on"}">${img(U(s.p,1300,640), "")}<div class="ov">${pub(s.pub,s.t)}<h3>${s.h}</h3>${reac(s.u,s.c)}</div>${s.local?`<span class="local"><svg width="11" height="11" viewBox="0 0 20 20" fill="#fff"><path d="M10 1a7 7 0 0 0-7 7c0 5 7 11 7 11s7-6 7-11a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 10 5.5a2.5 2.5 0 0 1 0 5z"/></svg>Local</span>`:""}</div>`).join("")}
+      <button class="carr l" onclick="heroGo(-1)" aria-label="Previous">‹</button><button class="carr r" onclick="heroGo(1)" aria-label="Next">›</button>
+      <div class="dots">${MSN_HERO.map((s,i)=>`<i class="${i?"":"on"}"></i>`).join("")}</div></div></article>`;
+  const disp = `<article class="mc disp" data-anchor="msn-rail" style="grid-row:span 1"><div class="ah">Ad <span class="adchoice">i</span></div>${flick("msn-rail","levis")}
+      <div class="af"><div><b>Baggy Overalls</b>See the fit from every side.</div><button onclick="shop('msn-rail')">Shop now</button></div></article>`;
+  const top = `<article class="mc"><div class="tl"><h4><svg width="16" height="16" viewBox="0 0 20 20"><path d="M10 2c2 4 6 5 6 10a6 6 0 0 1-12 0c0-3 2-4 2-6 1 1 2 2 2 3 0-3 1-5 2-7z" fill="#f97316"/></svg>Top stories</h4>
+      ${[["wire","3h","Holiday hiring starts earlier than last year"],["sky","5h","A clear sky forecast for this week's meteor shower"],["travel","6h","The cheapest weeks to fly before the holidays"],["metro","7h","Downtown library extends weekend hours"],["field","8h","Elk return to the valley as temperatures drop"]].map(x=>`<a class="it" href="#">${pub(x[0],x[1])}${x[2]}</a>`).join("")}</div></article>`;
+  const wx = `<article class="mc wx"><div class="t"><span style="display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 20 20" fill="#fff"><path d="M18 2L2 9l7 2 2 7z"/></svg>Seattle</span><span>···</span></div>
+      <div class="now"><svg width="50" height="50" viewBox="0 0 40 40"><circle cx="15" cy="15" r="7" fill="#f6c453"/><path d="M12 31h17a6 6 0 0 0-1.6-11.8A8 8 0 0 0 12.5 21 5 5 0 0 0 12 31z" fill="#e8eef6"/></svg><b>54<sup>°F</sup></b></div>
+      <div class="d"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#cfe0f5" stroke-width="1.5"><path d="M5 12a4 4 0 0 1 1-7.9A5 5 0 0 1 15.5 6 3.5 3.5 0 0 1 15 13H5M7 15l-1 2M11 15l-1 2M15 15l-1 2"/></svg>Expect light rain tomorrow</div>
+      <div class="days">${[["Today","58°","48°"],["Tue","55°","47°"],["Wed","57°","46°"],["Thu","60°","47°"],["Fri","59°","45°"]].map(d=>`<div>${d[0]}<b>${d[1]}</b>${d[2]}</div>`).join("")}</div>
+      <span class="ff">See full forecast</span></article>`;
+  document.getElementById("msn-g1").innerHTML =
+    hero +
+    msnStory("concert","pulse","10h","Summer tour adds three West Coast dates after selling out","446","295") +
+    disp +
+    top +
     msnNative("msn-pat","patagonia","Three jackets, one trail. Switch colours mid-hike.","Shop now") +
-    msnStory("p3","Weather · 1h","First winter storm moves across the mountains") +
-    `<article class="mcard wx"><div class="t">Seattle <span>···</span></div><div class="now"><svg width="44" height="44" viewBox="0 0 40 40"><circle cx="16" cy="16" r="8" fill="#f6c453"/><path d="M12 30h18a6 6 0 0 0-2-11.7A8 8 0 0 0 13 21a4.5 4.5 0 0 0-1 9z" fill="#dfe7f1"/></svg><b>54°F</b></div><div style="font-size:13px;color:#cfe0f5">Light rain expected tomorrow</div>
-      <div class="days"><div>Today<br>58°</div><div>Tue<br>55°</div><div>Wed<br>57°</div><div>Thu<br>60°</div><div>Fri<br>59°</div></div></article>`;
-  document.getElementById("msn-grid2").innerHTML =
+    msnPhoto("snowroad","sky","1h","First snow closes two mountain passes overnight","312","88") +
+    wx;
+  document.getElementById("msn-g2").innerHTML =
+    msnPhoto("bakery","kitchen","5h","The neighborhood bakeries worth getting up early for","1.1K","143") +
     msnNative("msn-nike","nike","Built for the long run. Pick your Universa set.","Shop now") +
-    msnStory("p4","Food · 7h","Five one-pan dinners for busy weeknights") +
+    msnStory("vineyard","travel","9h","Harvest season: the quiet weeks to visit wine country","534","61") +
+    msnStory("ev","wire","2h","What to check before buying a used EV","728","190") +
+    msnStory("library","metro","6h","Libraries are lending tools, telescopes and more","402","57") +
+    msnPhoto("pumpkin","wk","1d","Pumpkin patches report their busiest weekend yet","965","112") +
     msnNative("msn-bark","barkbox","Halloween toys your dog will actually play with","Shop now") +
-    msnStory("p5","Sports · 2h","Late goal settles a tight derby");
+    msnStory("runner","sports","3h","Marathon weekend: road closures and the best places to watch","611","74");
   observeFlicks();
+  clearInterval(heroT); heroI=0; heroT=setInterval(()=>heroGo(1,true), 6500);
+}
+function heroGo(d, auto){
+  const el=document.getElementById("msn-hero"); if(!el || !document.getElementById("v-msn").classList.contains("on")) return;
+  if(!auto){ clearInterval(heroT); heroT=setInterval(()=>heroGo(1,true), 6500); }
+  heroI=(heroI+d+MSN_HERO.length)%MSN_HERO.length;
+  el.querySelectorAll(".slide").forEach((s,i)=>s.classList.toggle("on", i===heroI));
+  el.querySelectorAll(".dots i").forEach((s,i)=>s.classList.toggle("on", i===heroI));
 }
 
 /* =====================================================================
    BING
    ===================================================================== */
+const STRIP = [["rain","Storm watch on the coast"],["leaves","Fall colours peak this week"],["rocket","Launch window opens Friday"],["runner","Marathon closes downtown roads"],["harbor","Harbor reopens after repairs"],["meteor","Meteor shower peaks tonight"],["ski","Ski resorts open early"],["pumpkin","Pumpkin patches draw crowds"]];
+const GAMES = [["chess","Chess Classic"],["puzzle","Jigsaw Daily"],["dice","Board Night"],["racecar","Turbo Laps"],["basketball","Hoop Shot"],["tennis","Ace Rally"]];
 function renderBing(){
   SURFACE="Bing"; SLOTS={};
-  const news=[["p1","Storm watch on the coast"],["p2","Fall colours peak early"],["p3","New trail opens upstate"],["p4","Museum night returns"],["p5","Harbour festival this week"]];
+  const bg=document.getElementById("bing-bg"); if(!bg.src) bg.src=U("fox",2400);
   document.getElementById("bh-feed").innerHTML = `
-    <div class="bh-news">${news.map(n=>`<a href="#/msn"><div class="tt">${n[1]}</div><div class="ph ${n[0]}"></div></a>`).join("")}</div>
+    <div class="strip"><div class="tr" id="bh-strip">${STRIP.map(n=>`<a href="#/msn" class="zoomimg"><div class="tt">${n[1]}</div><div class="ph">${img(U(n[0],400,200), "")}</div></a>`).join("")}</div>
+      <button class="sarr l" onclick="document.getElementById('bh-strip').scrollBy({left:-460})" aria-label="Previous">‹</button><button class="sarr r" onclick="document.getElementById('bh-strip').scrollBy({left:460})" aria-label="Next">›</button></div>
     <div class="bh-row top">
-      <a class="bcard story" href="#/msn"><div class="ph p6"></div><div class="ov"><small>Local News · 5d</small><h3>High tides reshape a stretch of the coastline</h3></div></a>
-      <div class="bcard wxb"><div style="display:flex;justify-content:space-between;font-weight:600;font-size:14px">Seattle<span>···</span></div>
-        <div style="display:flex;align-items:center;gap:10px;margin:14px 0"><svg width="48" height="48" viewBox="0 0 40 40"><circle cx="16" cy="16" r="8" fill="#f6c453"/><path d="M12 30h18a6 6 0 0 0-2-11.7A8 8 0 0 0 13 21a4.5 4.5 0 0 0-1 9z" fill="#dfe7f1"/></svg><b style="font-size:44px;font-weight:600">54°F</b></div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-size:12px;text-align:center">${["Today 58°","Tue 55°","Wed 57°","Thu 60°","Fri 59°"].map(d=>`<div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px 0">${d.replace(" ","<br>")}</div>`).join("")}</div></div>
+      <a class="bc hero lift" href="#/msn"><div class="ph zoomimg" style="position:absolute;inset:0">${img(U("beach",1200,620), "")}</div><span class="play"><svg width="18" height="18" viewBox="0 0 20 20" fill="#fff"><path d="M6 4l11 6-11 6z"/></svg></span>
+        <div class="ov">${pub("coast","5d")}<h3>King tides flood a stretch of beachfront homes along the coast</h3>${reac("535","26")}</div>
+        <div class="dots" style="bottom:auto;top:12px;left:auto;right:12px;transform:none">${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<i class="${i===11?"on":""}"></i>`).join("")}</div></a>
+      <div class="bc wxb"><div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15px"><span style="display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 20 20" fill="#fff"><path d="M18 2L2 9l7 2 2 7z"/></svg>Seattle</span><span>···</span></div>
+        <div style="display:flex;align-items:center;gap:10px;margin:16px 0 6px"><svg width="56" height="56" viewBox="0 0 40 40"><circle cx="15" cy="15" r="7" fill="#f6c453"/><path d="M12 31h17a6 6 0 0 0-1.6-11.8A8 8 0 0 0 12.5 21 5 5 0 0 0 12 31z" fill="#e8eef6"/></svg><b style="font-size:46px;font-weight:600">54</b><span style="font-size:16px;align-self:flex-start;margin-top:10px">°F</span><span style="margin-left:auto;font-size:12.5px;text-align:right;max-width:120px;line-height:1.35">Expect light rain tomorrow</span></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-size:12px;text-align:center;margin-top:30px">${[["Today","58°","48°"],["Tue","55°","47°"],["Wed","57°","46°"],["Thu","60°","47°"],["Fri","59°","45°"]].map(d=>`<div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px 0;line-height:1.55">${d[0]}<b style="display:block">${d[1]}</b>${d[2]}</div>`).join("")}</div>
+        <div style="text-align:center;margin-top:16px"><span style="font-size:12.5px;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 14px">See full forecast</span></div></div>
     </div>
     <div class="bh-row">
-      <div class="bcard" data-anchor="bing-sony">${flick("bing-sony","sony")}
-        <div class="adcap"><div class="row"><span>electronics.sony.com</span><span class="adl">Ad</span></div><h4>Sony WH-CH720N: all-day noise cancelling</h4><div class="vn">Showing <b data-vname="bing-sony">${BRANDS.sony.variants[0].n}</b> · <button onclick="shop('bing-sony')" style="color:#0067b8;font-weight:600">Shop now</button></div></div></div>
-      <a class="bcard" href="#/msn"><div class="ph p3" style="height:220px"></div><div class="tx"><small style="color:#666">Outdoors · 1d</small><h4>The easiest autumn hikes within an hour of the city</h4></div></a>
-      <div class="bcard games"><h4>Games</h4><div class="g">${["p1","p2","p3","p4","p5","p6"].map(p=>`<div class="ph ${p}"></div>`).join("")}</div></div>
+      <a class="bc lift" href="#/msn"><div class="ph zoomimg" style="height:206px">${img(U("plane",700,420), "")}</div><div class="tx">${pub("travel","3h")}<h4>The cheapest weeks to fly before the holidays, ranked</h4>${reac("312","48")}</div></a>
+      <div class="bc lift" data-anchor="bing-sony">${flick("bing-sony","sony")}
+        <div class="adcap"><div class="rw"><span>electronics.sony.com</span><span class="adl">Ad <span class="adchoice">i</span></span></div><h4>Sony WH-CH720N: all-day noise cancelling</h4><div class="vn">Showing <b data-vname="bing-sony">${BRANDS.sony.variants[0].n}</b> · <button onclick="shop('bing-sony')" style="color:#0067b8;font-weight:600">Shop now</button></div></div></div>
+      <div class="bc games"><div class="hd"><span style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5b3fb3" stroke-width="1.8"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1" fill="#5b3fb3"/><circle cx="18" cy="13.5" r="1" fill="#5b3fb3"/></svg>Games</span><span>···</span></div>
+        <div class="g">${GAMES.map(x=>`<a href="#" onclick="toast('Games open in MSN Play');return false"><div class="im zoomimg">${img(U(x[0],240,240), "")}</div><span>${x[1]}</span></a>`).join("")}</div></div>
     </div>
     <div class="bh-row">
-      <a class="bcard" href="#/msn"><div class="ph p4" style="height:220px"></div><div class="tx"><small style="color:#666">Money · 3h</small><h4>How holiday prices are shaping up this year</h4></div></a>
-      <div class="bcard" data-anchor="bing-gap">${flick("bing-gap","gap")}
-        <div class="adcap"><div class="row"><span>gap.com</span><span class="adl">Ad</span></div><h4>Fall layers from Gap. Switch the look.</h4><div class="vn">Showing <b data-vname="bing-gap">${BRANDS.gap.variants[0].n}</b> · <button onclick="shop('bing-gap')" style="color:#0067b8;font-weight:600">Shop now</button></div></div></div>
-      <a class="bcard" href="#/msn"><div class="ph p5" style="height:220px"></div><div class="tx"><small style="color:#666">Food · 6h</small><h4>The soup season starts here: five easy recipes</h4></div></a>
+      <div class="bc lift" data-anchor="bing-gap">${flick("bing-gap","gap")}
+        <div class="adcap"><div class="rw"><span>gap.com</span><span class="adl">Ad <span class="adchoice">i</span></span></div><h4>Fall layers from Gap. Switch the look.</h4><div class="vn">Showing <b data-vname="bing-gap">${BRANDS.gap.variants[0].n}</b> · <button onclick="shop('bing-gap')" style="color:#0067b8;font-weight:600">Shop now</button></div></div></div>
+      <a class="bc lift" href="#/msn"><div class="ph zoomimg" style="height:206px">${img(U("pan",700,420), "")}</div><div class="tx">${pub("kitchen","6h")}<h4>Five one-pan dinners for busy weeknights</h4>${reac("1.4K","96")}</div></a>
+      <a class="bc lift" href="#/msn"><div class="ph zoomimg" style="height:206px">${img(U("elk",700,420), "")}</div><div class="tx">${pub("field","1d")}<h4>Why elk are wandering into mountain towns this fall</h4>${reac("2.1K","133")}</div></a>
+    </div>
+    <div class="bh-row">
+      <a class="bc lift" href="#/msn"><div class="ph zoomimg" style="height:206px">${img(U("market",700,420), "")}</div><div class="tx">${pub("metro","8h")}<h4>Winter farmers markets open this weekend</h4>${reac("288","19")}</div></a>
+      <a class="bc lift" href="#/msn"><div class="ph zoomimg" style="height:206px">${img(U("lighthouse",700,420), "")}</div><div class="tx">${pub("travel","2d")}<h4>Twelve lighthouses you can sleep in</h4>${reac("3.2K","241")}</div></a>
+      <a class="bc lift" href="#/msn"><div class="ph zoomimg" style="height:206px">${img(U("coffee",700,420), "")}</div><div class="tx">${pub("kitchen","4h")}<h4>How to get café-style foam at home</h4>${reac("745","58")}</div></a>
     </div>`;
   observeFlicks();
 }
-const HP = c => `<svg width="70%" height="70%" viewBox="0 0 64 64"><path d="M14 36v-6a18 18 0 0 1 36 0v6" fill="none" stroke="${c}" stroke-width="4"/><rect x="9" y="34" width="11" height="18" rx="4" fill="${c}"/><rect x="44" y="34" width="11" height="18" rx="4" fill="${c}"/></svg>`;
-const EB = c => `<svg width="60%" height="60%" viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="28" rx="10" fill="${c}"/><circle cx="24" cy="34" r="6" fill="#fff" opacity=".35"/><circle cx="40" cy="34" r="6" fill="#fff" opacity=".35"/></svg>`;
 function goSearch(q){ q=(q||"").trim()||"long range headphones"; location.hash="#/bing/search?q="+encodeURIComponent(q); }
 function renderSerp(q){
   SURFACE="Bing"; SLOTS={};
   document.getElementById("serp-q").value=q;
-  const pc=(svg,name,price,was,st,sale)=>`<a class="pcard" href="#" onclick="toast('Product ad: opens the retailer page');return false"><div class="im">${sale?`<span class="tag">SALE</span>`:""}${svg}</div><div class="tx"><div class="nm">${name}</div><div class="pr">${price}${was?`<s>${was}</s>`:""}</div><div class="st">${st}</div></div></a>`;
+  const pc=(p,name,price,was,st,sale,ph)=>`<a class="pcard" href="#" onclick="toast('Product ad: opens the retailer page');return false"><div class="im zoomimg">${sale?`<span class="tag">SALE</span>`:""}${img(U(p,300,300), name)}${ph?`<div class="dts"><i></i><i></i><i></i></div>`:""}</div><div class="tx"><div class="nm">${name}</div><div class="pr">${price}${was?`<s>${was}</s>`:""}</div><div class="st">${st}</div></div></a>`;
   document.getElementById("serp-body").innerHTML = `
     <div>
       <div class="sr-sec-h"><h2>See ${esc(q.replace(/\b\w/g,c=>c.toUpperCase()))} ›</h2><small>Sponsored ⋮</small></div>
-      <div class="pcar" data-anchor="serp-shop"><div class="ptrack">
-        <div class="pcard fl"><div class="im">${flick("serp-sony","sony")}</div><div class="tx"><div class="nm" onclick="shop('serp-sony')" style="cursor:pointer">Sony WH-CH720N Wireless Noise Cancelling Headphones</div><div class="vn">Colour: <b data-vname="serp-sony">${BRANDS.sony.variants[0].n}</b></div><div class="st">Sony</div></div></div>
-        <div class="pcard fl"><div class="im">${flick("serp-bose","bose")}</div><div class="tx"><div class="nm" onclick="shop('serp-bose')" style="cursor:pointer">Bose QuietComfort Ultra Earbuds (2nd Gen)</div><div class="pr">$299.00</div><div class="st">Best Buy</div></div></div>
-        ${pc(HP("#2b2b2b"),"Wireless TV Headphones with Charging Dock","$69.97","$139.94","Audio retailer",1)}
-        ${pc(HP("#4b5a3a"),"Over-ear Wired Headphones, Long Coiled Cable","$34.99","","Marketplace")}
-        ${pc(HP("#6b6f78"),"TV Wireless Headphones, 150 ft Range","$103.99","","Home electronics")}
-        ${pc(HP("#1f3b6b"),"Bluetooth Headphones, 60h Battery","$59.99","$79.99","Audio retailer",1)}
-      </div><button class="pnext" onclick="this.previousElementSibling.scrollBy({left:320,behavior:'smooth'})" aria-label="Next">›</button></div>
+      <div class="pcar" data-anchor="serp-shop"><div class="ptrack" id="ptrack">
+        <div class="pcard fl"><div class="im">${flick("serp-sony","sony")}</div><div class="tx"><div class="nm" onclick="shop('serp-sony')">Sony WH-CH720N Wireless Noise Cancelling Headphones</div><div class="vn">Colour: <b data-vname="serp-sony">${BRANDS.sony.variants[0].n}</b></div><div class="st">Sony</div></div></div>
+        <div class="pcard fl"><div class="im">${flick("serp-bose","bose")}</div><div class="tx"><div class="nm" onclick="shop('serp-bose')">Bose QuietComfort Ultra Earbuds (2nd Gen)</div><div class="pr">$299.00</div><div class="st">Best Buy</div></div></div>
+        ${pc("hpy","Wireless Over-Ear Headphones, 60h Battery","$69.97","$139.94","Audio Outlet",1,1)}
+        ${pc("hpg","Wireless TV Headphones with 150 ft Range","$103.99","","Home Sound Co.",0,1)}
+        ${pc("hpw","Lightweight Bluetooth Headphones","$34.99","","Marketplace")}
+        ${pc("hpgr","Studio Headphones, Long Coiled Cable","$59.99","$79.99","Audio Outlet",1)}
+      </div><button class="pnext" onclick="document.getElementById('ptrack').scrollBy({left:320})" aria-label="Next">›</button></div>
 
       <div class="dect"><h2>Long range headphones</h2><div class="sub">Wireless headsets with extended range and varied designs</div>
-        <div class="g">${[["Office headset","Integrated touch display"],["Stereo headset","Dual ear coverage"],["Mono headset","Lightweight, one ear"]].map(d=>`<div><span class="im">${HP("#555")}</span><span><b>${d[0]}</b>${d[1]}</span></div>`).join("")}</div></div>
+        <div class="g">${[["hpg","Office headset","Integrated touch display"],["hpy","Stereo headset","Dual ear coverage"],["hpw","Mono headset","Lightweight, one ear"]].map(d=>`<div><span class="im">${img(U(d[0],120,120), "")}</span><span><b>${d[1]}</b>${d[2]}</span></div>`).join("")}</div></div>
 
       <div class="org">
-        ${[["A","Audio guide","How far can wireless headphones reach? Range explained","Bluetooth headphones typically reach about 30 feet indoors, while dedicated RF and DECT models can go much further. Here is what changes range and how to pick a set."],
-           ["H","Home theater forum","Best wireless headphones for watching TV","Owners compare RF headsets with base stations against Bluetooth models for range, lag and comfort during long evenings."],
-           ["T","Tech reviews","Long-range Bluetooth headphones: what to look for","Codec, antenna design and the version of Bluetooth all affect how far you can walk from your device before the sound drops."]]
-          .map(r=>`<div class="r"><div class="site"><i>${r[0]}</i><span>${r[1]}<small>Result</small></span></div><h3>${r[2]}</h3><p>${r[3]}</p></div>`).join("")}
+        ${[["#0f6cbd","AG","Audio Guide","audioguide.net › range","How far can wireless headphones reach? Range explained","Bluetooth headphones typically reach about 30 feet indoors, while dedicated RF and DECT models go much further. Here is what changes range and how to pick a set."],
+           ["#2f7d32","HT","Home Theater Forum","hometheaterforum.org › headphones","Best wireless headphones for watching TV","Owners compare RF headsets with base stations against Bluetooth models for range, lag and comfort during long evenings."],
+           ["#c2185b","TR","Tech Reviews","techreviews.io › audio","Long-range Bluetooth headphones: what to look for","Codec, antenna design and Bluetooth version all affect how far you can walk from your device before the sound drops."]]
+          .map(r=>`<div class="r"><div class="site"><i style="background:${r[0]}">${r[1]}</i><span>${r[2]}<small>${r[3]}</small></span></div><h3>${r[4]}</h3><p>${r[5]}</p></div>`).join("")}
       </div>
     </div>
     <aside>
@@ -972,7 +1105,7 @@ function renderSerp(q){
         <p>Light, all-day noise cancelling headphones with long battery life. Tap a colour to see it.</p>
         <div class="vn">Showing <b data-vname="serp-mma">${BRANDS.sony.variants[0].n}</b></div>
         <div class="btns"><button class="pri" onclick="shop('serp-mma')">Shop now</button><button onclick="shop('serp-mma')">Compare models</button></div></div></div>
-      <div class="rel"><h4>Related searches</h4>${["wireless tv headphones long range","dect headset range","best long range bluetooth headphones","rf headphones vs bluetooth"].map(s=>`<a href="#" onclick="goSearch('${s}');return false">${s}</a>`).join("")}</div>
+      <div class="rel"><h4>Related searches</h4>${["wireless tv headphones long range","dect headset range","best long range bluetooth headphones","rf headphones vs bluetooth"].map(s=>`<a href="#" onclick="goSearch('${s}');return false"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#777" stroke-width="1.6"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></svg>${s}</a>`).join("")}</div>
     </aside>`;
   observeFlicks();
 }
@@ -984,8 +1117,8 @@ const GUIDE = [
   ["Copilot", [
     ["Pick up where you left off","#/copilot","cop-home"],
     ["Answer with three car Flicks","#/copilot/cars","cop-merc"],
-    ["Showroom: Mercedes-Benz","#/copilot/showroom/merc","sr-merc"],
-    ["Showroom: Bentley","#/copilot/showroom/bentley","sr-bentley"],
+    ["Showroom: Mercedes-Benz S-Class","#/copilot/showroom/merc","sr-merc"],
+    ["Showroom: Bentley Torcal","#/copilot/showroom/bentley","sr-bentley"],
     ["Showroom: Cadillac","#/copilot/showroom/cadillac","sr-cadillac"]]],
   ["MSN", [
     ["Top banner (Gap)","#/msn","msn-top"],
@@ -1010,17 +1143,14 @@ function toggleGuide(force){
   document.getElementById("gpill").setAttribute("aria-expanded", on);
 }
 let pendingAnchor=null;
-function jump(h,a){
-  toggleGuide(false); pendingAnchor=a;
-  if(location.hash===h) focusAnchor(); else location.hash=h;
-}
+function jump(h,a){ toggleGuide(false); pendingAnchor=a; if(location.hash===h) focusAnchor(); else location.hash=h; }
 function focusAnchor(){
   if(!pendingAnchor) return; const a=pendingAnchor; pendingAnchor=null;
   setTimeout(()=>{
     const el=document.querySelector(`[data-anchor="${a}"]`); if(!el) return;
     el.scrollIntoView({behavior:"smooth", block:"center"});
     el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse");
-  }, location.hash==="#/copilot/cars" ? 1700 : 250);
+  }, location.hash==="#/copilot/cars" ? 1700 : 300);
 }
 
 /* =====================================================================
@@ -1031,6 +1161,7 @@ function route(){
   const h=location.hash||"#/copilot";
   const [path, qs] = h.slice(1).split("?");
   const prev=lastRoute; lastRoute=path;
+  if(path!=="/msn") clearInterval(heroT);
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
   document.getElementById("sr").classList.remove("on"); document.body.classList.remove("sr-open");
   document.querySelectorAll(".gitem").forEach(el=>el.classList.toggle("cur", el.dataset.h.split("?")[0]==="#"+path));
@@ -1041,13 +1172,15 @@ function route(){
     if(m){ if(cpStage!=="cars") renderCopilot("cars", false); renderShowroom(m[1]); }
     else if(path==="/copilot/cars"){ renderCopilot("cars", !prev.startsWith("/copilot/showroom")); }
     else renderCopilot("home");
-  } else if(path==="/msn"){ document.getElementById("v-msn").classList.add("on"); renderMSN(); scrollTo(0,0); }
-  else if(path==="/bing/search"){ document.getElementById("v-serp").classList.add("on"); const q=new URLSearchParams(qs||"").get("q")||"long range headphones"; renderSerp(q); scrollTo(0,0); }
-  else { document.getElementById("v-bing").classList.add("on"); renderBing(); scrollTo(0,0); }
+  } else if(path==="/msn"){ document.getElementById("v-msn").classList.add("on"); renderMSN(); window.scrollTo({top:0,behavior:'instant'}); }
+  else if(path==="/bing/search"){ document.getElementById("v-serp").classList.add("on"); const q=new URLSearchParams(qs||"").get("q")||"long range headphones"; renderSerp(q); window.scrollTo({top:0,behavior:'instant'}); }
+  else { document.getElementById("v-bing").classList.add("on"); renderBing(); window.scrollTo({top:0,behavior:'instant'}); }
   focusAnchor();
 }
 addEventListener("hashchange", route);
 renderGuide(); route();
+// warm the car images so showrooms open instantly
+addEventListener("load", ()=>setTimeout(()=>["merc","bentley","cadillac"].forEach(k=>BRANDS[k].variants.forEach(v=>{ const i=new Image(); i.src=v.img; })), 1200));
 </script>
 </body>
 </html>
