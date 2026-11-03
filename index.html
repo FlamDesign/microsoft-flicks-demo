@@ -821,7 +821,7 @@ let io = null;
 const live = ".view.on .flick[data-slot], #sr.on .flick[data-slot]";
 function observeFlicks(){
   if(io) io.disconnect();
-  io = new IntersectionObserver(entries=>{ entries.forEach(en=>{ if(en.isIntersecting) mount(en.target); }); // keep players once loaded so scrolling back never reloads them }, { rootMargin:"900px 0px 900px 0px" });
+  io = new IntersectionObserver(entries=>{ entries.forEach(en=>{ if(en.isIntersecting) mount(en.target); }); /* keep players once loaded so scrolling back never reloads them */ }, { rootMargin:"900px 0px 900px 0px" });
   document.querySelectorAll(live).forEach(h=>io.observe(h));
   requestAnimationFrame(mountVisible); setTimeout(mountVisible, 80); setTimeout(settleImgs, 50);
 }
