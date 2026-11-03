@@ -43,7 +43,7 @@ img.fi.ld{opacity:1}
 .fwarn{position:absolute;left:8px;bottom:8px;font-size:11px;background:#fff6db;color:#7a5600;border-radius:999px;padding:3px 9px;pointer-events:none}
 .flick.fl-bentley{background:radial-gradient(120% 90% at 50% 45%,#3a3f44 0%,#16181a 60%,#08090a 100%)}
 
-/* ============ Ad selector ============ */
+/* ============ Flicks types selector ============ */
 .gpill{position:fixed;right:20px;bottom:20px;z-index:90;display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;background:#1b1b1b;color:#f2f2f2;font-weight:600;font-size:13px;box-shadow:0 0 0 1px #3a3a3a,0 8px 24px rgba(0,0,0,.45);transition:bottom .3s var(--ease),background .2s}
 .gpill:hover{background:#262626}
 .gpill i{font-style:normal;background:#0078d4;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
@@ -665,9 +665,9 @@ img.fi.ld{opacity:1}
 </section>
 
 <!-- ================= shared chrome ================= -->
-<button class="gpill" id="gpill" onclick="toggleGuide()" aria-expanded="false">Ad formats <i id="gcount"></i></button>
+<button class="gpill" id="gpill" onclick="toggleGuide()" aria-expanded="false">Flicks types <i id="gcount"></i></button>
 <div class="gscrim" id="gscrim" onclick="toggleGuide(false)"></div>
-<div class="gpanel" id="gpanel" role="dialog" aria-label="Ad formats"></div>
+<div class="gpanel" id="gpanel" role="dialog" aria-label="Flicks types"></div>
 
 <div class="scrim" id="scrim" onclick="if(event.target===this)closeSheet()">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h">
@@ -1201,26 +1201,26 @@ function renderSerp(q){
 }
 
 /* =====================================================================
-   Ad selector (bottom right)
+   Flicks types selector (bottom right)
    ===================================================================== */
 const GUIDE = [
   ["Copilot", [
-    ["Pick up where you left off","#/copilot","cop-home"],
-    ["Answer with three car Flicks","#/copilot/cars","cop-merc"],
-    ["Showroom: Mercedes-Benz S-Class","#/copilot/showroom/merc","sr-merc"],
-    ["Showroom: Bentley Torcal","#/copilot/showroom/bentley","sr-bentley"],
-    ["Showroom: Cadillac","#/copilot/showroom/cadillac","sr-cadillac"]]],
+    ["Conversation start: pick up where you left off","#/copilot","cop-home"],
+    ["Product cards in an answer (Mercedes-Benz, Bentley, Cadillac)","#/copilot/cars","cop-merc"],
+    ["Showroom hero: Mercedes-Benz S-Class","#/copilot/showroom/merc","sr-merc"],
+    ["Showroom hero: Bentley Torcal","#/copilot/showroom/bentley","sr-bentley"],
+    ["Showroom hero: Cadillac lineup","#/copilot/showroom/cadillac","sr-cadillac"]]],
   ["MSN", [
-    ["Top banner (Gap)","#/msn","msn-top"],
-    ["Display ad, right rail (Levi's)","#/msn","msn-rail"],
-    ["Native card in feed (Patagonia)","#/msn","msn-pat"],
-    ["Native card in feed (Nike)","#/msn","msn-nike"],
-    ["Native card in feed (BARK)","#/msn","msn-bark"]]],
+    ["Banner, top of page (Gap)","#/msn","msn-top"],
+    ["Display card, right rail (Levi's)","#/msn","msn-rail"],
+    ["Content card in feed (Patagonia)","#/msn","msn-pat"],
+    ["Content card in feed (Nike)","#/msn","msn-nike"],
+    ["Content card in feed (BARK)","#/msn","msn-bark"]]],
   ["Bing", [
-    ["Homepage native tile (Sony)","#/bing","bing-sony"],
-    ["Homepage native tile (Gap)","#/bing","bing-gap"],
-    ["Search: shopping ads (Sony, Bose)","#/bing/search?q=long%20range%20headphones","serp-shop"],
-    ["Search: multimedia ad (Sony)","#/bing/search?q=long%20range%20headphones","serp-mma"]]]
+    ["Content card on homepage (Sony)","#/bing","bing-sony"],
+    ["Content card on homepage (Gap)","#/bing","bing-gap"],
+    ["Product cards in shopping results (Sony, Bose)","#/bing/search?q=long%20range%20headphones","serp-shop"],
+    ["Rich media card in search (Sony)","#/bing/search?q=long%20range%20headphones","serp-mma"]]]
 ];
 function renderGuide(){
   let n=0;
